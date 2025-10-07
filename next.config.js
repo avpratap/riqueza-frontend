@@ -1,13 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['localhost', 'cdn.olaelectric.com', 'res.cloudinary.com'],
+    domains: ['localhost', 'cdn.olaelectric.com', 'res.cloudinary.com', 'assets.olaelectric.com'],
     formats: ['image/webp', 'image/avif'],
   },
   env: {
-    CUSTOM_KEY: 'ola-electric-clone',
-    NEXT_PUBLIC_BACKEND_URL: 'http://localhost:5000',
+    CUSTOM_KEY: 'riqueza-electric',
+    NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000',
   },
+  // Enable static exports for Vercel
+  output: 'standalone',
+  // Optimize for production
+  swcMinify: true,
+  // Enable compression
+  compress: true,
 }
 
 module.exports = nextConfig
