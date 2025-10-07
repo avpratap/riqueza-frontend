@@ -42,7 +42,8 @@ export default function TestOrderPage() {
       setResult({ success: true, order })
     } catch (error) {
       console.error('Order creation failed:', error)
-      setResult({ success: false, error: error.message })
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      setResult({ success: false, error: errorMessage })
     } finally {
       setLoading(false)
     }
