@@ -38,10 +38,14 @@ const OrderConfirmationPage = () => {
           orderData = await orderService.getOrderByNumber(orderNumber)
         }
         
-        setOrder(orderData.order)
-        // Convert order items to have categorized accessories
-        const categorizedItems = convertOrderItemsToCategorized(orderData.items)
-        setOrderItems(categorizedItems)
+        if (orderData) {
+          setOrder(orderData.order)
+          // Convert order items to have categorized accessories
+          const categorizedItems = convertOrderItemsToCategorized(orderData.items)
+          setOrderItems(categorizedItems)
+        } else {
+          setError('Order not found')
+        }
       } catch (err) {
         console.error('Failed to fetch order:', err)
         setError('Failed to load order details')
