@@ -10,7 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@react-three/drei": "^10.7.6",
+    "@react-three/drei": "^9.88.13",
     "@react-three/fiber": "^9.3.0",
     "@reduxjs/toolkit": "^1.9.7",
     "@types/recharts": "^1.8.29",
