@@ -2,9 +2,15 @@
 // Dynamic import to avoid compilation issues
 
 // Twilio Configuration (Get these from https://console.twilio.com/)
-const TWILIO_ACCOUNT_SID = process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID
-const TWILIO_AUTH_TOKEN = process.env.NEXT_PUBLIC_TWILIO_AUTH_TOKEN
-const TWILIO_PHONE_NUMBER = process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER
+const TWILIO_ACCOUNT_SID = process.env.NODE_ENV === 'production' 
+  ? 'your_twilio_account_sid' 
+  : process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID
+const TWILIO_AUTH_TOKEN = process.env.NODE_ENV === 'production' 
+  ? 'your_twilio_auth_token' 
+  : process.env.NEXT_PUBLIC_TWILIO_AUTH_TOKEN
+const TWILIO_PHONE_NUMBER = process.env.NODE_ENV === 'production' 
+  ? '+1234567890' 
+  : process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER
 
 
 // Initialize Twilio client
