@@ -241,10 +241,13 @@ const OrderConfirmationPage = () => {
                           style={{ 
                             filter: item.color_code ? `hue-rotate(${getHueRotation(item.color_code)})` : 'none' 
                           }}
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            e.currentTarget.nextElementSibling.style.display = 'flex';
-                          }}
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (nextElement) {
+                            nextElement.style.display = 'flex';
+                          }
+                        }}
                         />
                       ) : null}
                       <div className="w-full h-full bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl flex items-center justify-center" style={{ display: item.product_images && item.product_images.length > 0 ? 'none' : 'flex' }}>
