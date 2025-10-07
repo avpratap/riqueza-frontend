@@ -13,7 +13,9 @@
     "prefer-const": "off",
     "no-var": "off",
     "no-console": "off",
-    "import/no-anonymous-default-export": "off"
+    "import/no-anonymous-default-export": "off",
+    "@next/next/no-img-element": "off",
+    "react/no-unescaped-entities": "off"
   },
   "env": {
     "browser": true,
