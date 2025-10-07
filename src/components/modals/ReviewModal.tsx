@@ -87,7 +87,7 @@ const ReviewModal = ({ isOpen, onClose }: ReviewModalProps) => {
     setError('')
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/reviews/submit`, {
+      const response = await fetch(`${process.env.NODE_ENV === 'production' ? 'https://riqueza-backend.vercel.app' : 'http://localhost:5000'}/api/reviews/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
