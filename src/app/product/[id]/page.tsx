@@ -62,8 +62,8 @@ export default function ProductPage({ params }: ProductPageProps) {
       <ProductHero product={selectedProduct} />
       <ChooseYourPro product={selectedProduct} />
       <ProductTabsSection />
-      <ProductCustomization product={selectedProduct} />
-      <ComparisonTable product={selectedProduct} />
+      <ProductCustomization />
+      <ComparisonTable />
       <Footer />
     </div>
   )
