@@ -154,7 +154,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
     {
       id: 'chargerScreen',
       title: 'Protect your Charger & Screen',
-      description: 'Secure your Ola S1\'s display and charger from accidental damage and theft.',
+      description: 'Secure your Riqueza S1\'s display and charger from accidental damage and theft.',
       price: '799/yr'
     },
     {
@@ -431,7 +431,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
 
               {/* Insurance Required */}
               <div className="text-xs text-gray-500">
-                Insurance is required by law to ride the Requeza S1 Pro
+                Insurance is required by law to ride the Riqueza S1 Pro
               </div>
             </div>
 
@@ -622,7 +622,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
                   className="text-blue-600 underline cursor-pointer hover:text-blue-800"
                   onClick={() => setIsTermsModalOpen(true)}
                 >
-                  Requeza Financial Services
+                  Riqueza Financial Services
                 </span>
                 , and allow the insurer to fetch and process CKYC details for performing KYC
               </div>
@@ -789,7 +789,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
 
             {/* Insurance Required */}
             <div className="text-xs text-gray-500">
-              Insurance is required by law to ride the Requeza S1 Pro
+              Insurance is required by law to ride the Riqueza S1 Pro
             </div>
           </div>
 
@@ -1164,7 +1164,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
       onClose={() => setIsPdfModalOpen(false)}
       title="Privacy Policy"
       pdfUrl="/documents/ola-financial-services-privacy-policy.pdf"
-      pdfTitle="OLA Financial Services Privacy Policy"
+      pdfTitle="Riqueza Financial Services Privacy Policy"
     />
 
     {/* Terms Modal */}

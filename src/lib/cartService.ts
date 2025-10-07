@@ -91,7 +91,7 @@ class CartService {
         if (typeof window !== 'undefined') {
           try {
             // Try new auth storage format first
-            const authData = localStorage.getItem('requeza_auth_data');
+            const authData = localStorage.getItem('riqueza_auth_data');
             if (authData) {
               const parsed = JSON.parse(authData);
               authToken = parsed.token;

@@ -112,7 +112,7 @@ export const sendOTP = async (phoneNumber: string): Promise<{ success: boolean; 
     // Send real SMS via Twilio
     console.log('📱 Sending SMS via Twilio to:', phoneNumber)
     const message = await twilioClient.messages.create({
-      body: `Your Requeza Electric OTP is: ${otp}. Valid for 5 minutes.`,
+      body: `Your Riqueza Electric OTP is: ${otp}. Valid for 5 minutes.`,
       from: TWILIO_PHONE_NUMBER,
       to: phoneNumber
     })

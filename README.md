@@ -1,6 +1,6 @@
-# Ola Electric Clone - Frontend Application
+# Riqueza Electric - Frontend Application
 
-A modern, responsive frontend application that replicates the Ola Electric website using React, Next.js, TypeScript, Tailwind CSS, and Redux Toolkit.
+A modern, responsive frontend application for Riqueza Electric using React, Next.js, TypeScript, Tailwind CSS, and Redux Toolkit.
 
 ## 🚀 Features
 
@@ -289,7 +289,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🙏 Acknowledgments
 
-- Ola Electric for inspiration
+- Electric vehicle industry for inspiration
 - Next.js team for the amazing framework
 - Tailwind CSS team for the utility-first CSS framework
 - Redux team for state management solutions

@@ -10,10 +10,10 @@ import CartModal from '@/components/modals/CartModal'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Ola Electric Clone - Electric Vehicles & Mobility Solutions',
+  title: 'Riqueza Electric - Electric Vehicles & Mobility Solutions',
   description: 'Experience the future of mobility with our electric vehicles, scooters, and sustainable transportation solutions.',
-  keywords: 'electric vehicles, electric scooters, sustainable mobility, green transportation, Ola Electric',
-  authors: [{ name: 'Ola Electric Clone Team' }],
+  keywords: 'electric vehicles, electric scooters, sustainable mobility, green transportation, Riqueza Electric',
+  authors: [{ name: 'Riqueza Electric Team' }],
   viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
 }

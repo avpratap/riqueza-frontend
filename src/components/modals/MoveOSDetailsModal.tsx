@@ -128,8 +128,8 @@ const MoveOSDetailsModal = ({ isOpen, onClose, moveOSAdded, setMoveOSAdded }: Mo
     {
       type: 'image',
       src: '/images/MoveOS/navigation.png',
-      title: 'Navigation powered by Ola Maps',
-      subtitle: 'Navigate easily with on-screen directions from Ola Maps.'
+      title: 'Navigation powered by Riqueza Maps',
+      subtitle: 'Navigate easily with on-screen directions from Riqueza Maps.'
     },
     {
       type: 'image',

@@ -15,33 +15,33 @@ const Hero = () => {
   const { products } = useSelector((state: RootState) => state.products)
 
   // Get products from Redux state
-  const requezaS1ProPlus = products.find(p => p.slug === 'requeza-s1-pro-plus')
-  const requezaS1Pro = products.find(p => p.slug === 'requeza-s1-pro')
+  const requezaS1ProPlus = products.find(p => p.slug === 'riqueza-s1-pro-plus')
+  const requezaS1Pro = products.find(p => p.slug === 'riqueza-s1-pro')
 
   const heroSlides = [
     {
       id: 1,
       badge: "INTRODUCING",
-      title: "Requeza S1 Pro+",
+      title: "Riqueza S1 Pro+",
       subtitle: "Meet India's most powerful scooter",
       cta: "Explore S1 Pro+",
       ctaSecondary: "Book Now",
       image: "https://res.cloudinary.com/dnulm62j6/image/upload/v1758558786/s1_pro_plus_banner_web_v2_ttur01.webp",
       color: "red",
       product: requezaS1ProPlus,
-      slug: "requeza-s1-pro-plus"
+      slug: "riqueza-s1-pro-plus"
     },
     {
       id: 2,
       badge: "INTRODUCING",
-      title: "Requeza S1 Pro",
+      title: "Riqueza S1 Pro",
       subtitle: "Scooter for every Indian, now gets even better!",
       cta: "Explore S1 Pro",
       ctaSecondary: "Book Now",
       image: "https://res.cloudinary.com/dnulm62j6/image/upload/v1758558786/s1_x_gen3_plus_banner_web_image_iuok1i.webp",
       color: "blue",
       product: requezaS1Pro,
-      slug: "requeza-s1-pro"
+      slug: "riqueza-s1-pro"
     },
     // {
     //   id: 3,

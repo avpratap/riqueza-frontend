@@ -33,7 +33,7 @@ const ComparisonModal = ({ isOpen, onClose }: ComparisonModalProps) => {
   const variants = [
     {
       id: 's1pro',
-      name: 'Requeza S1 Pro',
+      name: 'Riqueza S1 Pro',
       acceleration: '2.3 sec',
       peakPower: '11 kW',
       certifiedRange: '195 km',
@@ -46,7 +46,7 @@ const ComparisonModal = ({ isOpen, onClose }: ComparisonModalProps) => {
     },
     {
       id: 's1proplus',
-      name: 'Requeza S1 Pro+',
+      name: 'Riqueza S1 Pro+',
       acceleration: '2.1 sec',
       peakPower: '13 kW',
       certifiedRange: '320 km',

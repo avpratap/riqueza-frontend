@@ -167,7 +167,7 @@ const OrderConfirmationPage = () => {
                   <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
                     <span className="text-white font-bold text-lg">R</span>
                   </div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Requeza Electric</h1>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Riqueza Electric</h1>
                 </div>
               </div>
             </div>
@@ -189,7 +189,7 @@ const OrderConfirmationPage = () => {
               Order Placed Successfully!
             </h1>
             <p className="text-gray-600 mb-6 text-lg">
-              Thank you for choosing Requeza Electric! We'll send you a confirmation email shortly.
+              Thank you for choosing Riqueza Electric! We'll send you a confirmation email shortly.
             </p>
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 inline-block shadow-md">
               <p className="text-sm text-gray-500 mb-2">Order Number</p>

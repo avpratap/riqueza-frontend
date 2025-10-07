@@ -88,7 +88,7 @@ const EssentialCareModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, isAd
                 <div className="flex items-center gap-2 mb-3">
                   <img
                     src="https://assets.olaelectric.com/olaelectric-videos/configs-static/assets/zeroOrder/Ola+Essential.svg"
-                    alt="OLA Essential Care"
+                    alt="Riqueza Essential Care"
                     className="h-6"
                   />
                 </div>
@@ -154,7 +154,7 @@ const EssentialCareModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, isAd
                       <div>
                         <div className="font-semibold text-gray-900 mb-2">How do I book this service?</div>
                         <div className="text-sm text-gray-600">
-                          You can book this service via the Ola Electric app or visit an Ola Store and speak to our service managers.
+                          You can book this service via the Riqueza Electric app or visit a Riqueza Store and speak to our service managers.
                         </div>
                       </div>
                       

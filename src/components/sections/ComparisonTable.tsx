@@ -122,7 +122,7 @@ const ComparisonTable = () => {
                       ? 'bg-gradient-to-r from-blue-600 via-green-500 to-yellow-500 bg-clip-text text-transparent' 
                       : 'text-gray-900'
                   }`}>
-                    Requeza S1 Pro
+                    Riqueza S1 Pro
                   </h3>
                   <div className={`h-1 rounded transition-colors duration-200 ${
                     selectedProduct === 's1pro' ? 'bg-gradient-to-r from-blue-600 via-green-500 to-yellow-500' : 'bg-gray-300'
@@ -140,7 +140,7 @@ const ComparisonTable = () => {
                       ? 'bg-gradient-to-r from-blue-600 via-green-500 to-yellow-500 bg-clip-text text-transparent' 
                       : 'text-gray-900'
                   }`}>
-                    Requeza S1 Pro+
+                    Riqueza S1 Pro+
                   </h3>
                   <div className={`h-1 rounded transition-colors duration-200 ${
                     selectedProduct === 's1proplus' ? 'bg-gradient-to-r from-blue-600 via-green-500 to-yellow-500' : 'bg-gray-300'

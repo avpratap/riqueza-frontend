@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { ChevronRight, Wrench, Fingerprint, Truck, GraduationCap, Settings, Stethoscope, Home } from 'lucide-react'
 
-interface OlaCareModalProps {
+interface RiquezaCareModalProps {
   isOpen: boolean
   onClose: () => void
   onAdd: () => void
@@ -12,7 +12,7 @@ interface OlaCareModalProps {
   isAdded: boolean
 }
 
-const OlaCareModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, isAdded }: OlaCareModalProps) => {
+const RiquezaCareModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, isAdded }: RiquezaCareModalProps) => {
   const [showFAQs, setShowFAQs] = useState(false)
   const [showTerms, setShowTerms] = useState(false)
   const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false)
@@ -612,4 +612,4 @@ const OlaCareModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, isAdded }:
   )
 }
 
-export default OlaCareModal
+export default RiquezaCareModal

@@ -95,7 +95,7 @@ const AboutPage = () => {
             >
               About{' '}
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Requeza
+                Riqueza
               </span>
             </motion.h1>
             
@@ -189,7 +189,7 @@ const AboutPage = () => {
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold text-gray-900">The Beginning</h3>
                   <p className="text-gray-600 leading-relaxed">
-                    Requeza Electric was born from a simple yet powerful vision: to make electric vehicles 
+                    Riqueza Electric was born from a simple yet powerful vision: to make electric vehicles 
                     accessible to every Indian. Our journey began in 2020 when our founders recognized the 
                     urgent need for sustainable mobility solutions in India.
                   </p>

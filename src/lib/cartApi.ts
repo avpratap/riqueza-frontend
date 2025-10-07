@@ -5,14 +5,14 @@ const getAuthToken = () => {
   if (typeof window !== 'undefined') {
     try {
       // First try the new auth storage format
-      const authData = localStorage.getItem('requeza_auth_data');
+      const authData = localStorage.getItem('riqueza_auth_data');
       if (authData) {
         const parsed = JSON.parse(authData);
         if (parsed.token) {
           // Simple check - if token looks valid (has 3 parts separated by dots)
           const parts = parsed.token.split('.');
           if (parts.length === 3) {
-            console.log('🔑 Auth token found (from requeza_auth_data):', parsed.token.substring(0, 20) + '...');
+            console.log('🔑 Auth token found (from riqueza_auth_data):', parsed.token.substring(0, 20) + '...');
             return parsed.token;
           }
         }

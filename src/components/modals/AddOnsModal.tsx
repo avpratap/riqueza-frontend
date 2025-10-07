@@ -7,7 +7,7 @@ import { RootState, AppDispatch } from '@/store/store'
 import { addToCart } from '@/store/slices/cartSlice'
 import MoveOSDetailsModal from './MoveOSDetailsModal'
 import EssentialCareModal from './EssentialCareModal'
-import OlaCareModal from './OlaCareModal'
+import RiquezaCareModal from './RiquezaCareModal'
 import ExtendedWarrantyModal from './ExtendedWarrantyModal'
 import InsuranceModal from './InsuranceModal'
 
@@ -85,7 +85,7 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
     {
       id: 'extendedWarranty',
       title: 'Extended Warranty',
-      description: 'Get up to 8 years or 80,000km on the Ola S1.',
+      description: 'Get up to 8 years or 80,000km on the Riqueza S1.',
       price: '7079',
       hasGST: false,
       imageUrl: 'https://assets.olaelectric.com/olaelectric-videos/configs-static/assets/zeroOrder/addOnnEWIMG.png',
@@ -494,7 +494,7 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
       />
 
       {/* OLA CARE+ Modal */}
-      <OlaCareModal
+      <RiquezaCareModal
         isOpen={isOlaCareModalOpen}
         onClose={() => setIsOlaCareModalOpen(false)}
         onAdd={() => {

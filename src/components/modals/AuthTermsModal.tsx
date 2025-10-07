@@ -36,7 +36,7 @@ const AuthTermsModal = ({ isOpen, onClose, type }: AuthTermsModalProps) => {
                 <div className="mb-4 sm:mb-6">
                   <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Terms of Service</h3>
                   <p className="text-xs sm:text-sm text-gray-800 leading-relaxed mb-3 sm:mb-4 break-words">
-                    Welcome to Requeza Electric. These Terms of Service ("Terms") govern your use of our website, mobile application, and services (collectively, the "Service") operated by Requeza Electric ("us", "we", or "our").
+                    Welcome to Riqueza Electric. These Terms of Service ("Terms") govern your use of our website, mobile application, and services (collectively, the "Service") operated by Riqueza Electric ("us", "we", or "our").
                   </p>
                 </div>
 
@@ -50,7 +50,7 @@ const AuthTermsModal = ({ isOpen, onClose, type }: AuthTermsModalProps) => {
                 <div className="mb-4 sm:mb-6">
                   <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-2 sm:mb-3">2. Use License</h4>
                   <p className="text-xs sm:text-sm text-gray-800 leading-relaxed mb-2 sm:mb-3 break-words">
-                    Permission is granted to temporarily download one copy of the materials on Requeza Electric's website for personal, non-commercial transitory viewing only.
+                    Permission is granted to temporarily download one copy of the materials on Riqueza Electric's website for personal, non-commercial transitory viewing only.
                   </p>
                 </div>
 
@@ -87,7 +87,7 @@ const AuthTermsModal = ({ isOpen, onClose, type }: AuthTermsModalProps) => {
                 <div className="mb-4 sm:mb-6">
                   <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Privacy Policy</h3>
                   <p className="text-xs sm:text-sm text-gray-800 leading-relaxed mb-3 sm:mb-4 break-words">
-                    This Privacy Policy describes how Requeza Electric ("we", "us", or "our") collects, uses, and shares your personal information when you use our website, mobile application, and services.
+                    This Privacy Policy describes how Riqueza Electric ("we", "us", or "our") collects, uses, and shares your personal information when you use our website, mobile application, and services.
                   </p>
                 </div>
 

@@ -76,7 +76,7 @@
 //       const bestAcceleration = Math.min(...product.variants.map((v: any) => v.acceleration_sec))
       
 //       return {
-//         name: product.name, // Use the product name directly (e.g., "Requeza S1 Pro+")
+//         name: product.name, // Use the product name directly (e.g., "Riqueza S1 Pro+")
 //         image: primaryImage?.image_url || 'https://res.cloudinary.com/dnulm62j6/image/upload/v1758559111/ola_s1pro_plus_gen3_web_image_v2_1_xz59rm.webp',
 //         alt: product.name,
 //         specifications: `${highestRange}km Range | 0-40 km/h in ${bestAcceleration} sec | Up to 2 portable batteries`,

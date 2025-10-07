@@ -24,9 +24,9 @@ const ProductHero = ({ product }: ProductHeroProps) => {
     }
     
     // Use the same background images as Hero section
-    if (product.slug === 'requeza-s1-pro-plus' || product.name?.toLowerCase().includes('pro+')) {
+    if (product.slug === 'riqueza-s1-pro-plus' || product.name?.toLowerCase().includes('pro+')) {
       return "https://res.cloudinary.com/dnulm62j6/image/upload/v1758558786/s1_pro_plus_banner_web_v2_ttur01.webp";
-    } else if (product.slug === 'requeza-s1-pro' || product.name?.toLowerCase().includes('s1 pro')) {
+    } else if (product.slug === 'riqueza-s1-pro' || product.name?.toLowerCase().includes('s1 pro')) {
       return "https://res.cloudinary.com/dnulm62j6/image/upload/v1758558786/s1_x_gen3_plus_banner_web_image_iuok1i.webp";
     }
     
@@ -49,7 +49,7 @@ const ProductHero = ({ product }: ProductHeroProps) => {
       <div className="absolute inset-0">
         <Image
           src={getBackgroundImage()}
-          alt={product?.name || "Requeza Electric Scooter"}
+          alt={product?.name || "Riqueza Electric Scooter"}
           fill
           className="w-full h-full object-cover"
           priority

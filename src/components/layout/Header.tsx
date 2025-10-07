@@ -165,8 +165,8 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
   }, [isMobileMenuOpen, dispatch])
 
   const scooterModels = [
-    { name: 'Requeza S1 Pro+', href: '/product/requeza-s1-pro-plus' },
-    { name: 'Requeza S1 Pro', href: '/product/requeza-s1-pro' },
+    { name: 'Riqueza S1 Pro+', href: '/product/requeza-s1-pro-plus' },
+    { name: 'Riqueza S1 Pro', href: '/product/requeza-s1-pro' },
   ]
 
   const navigation = [
@@ -195,7 +195,7 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
               </div>
               <div className="flex flex-col">
                 <span className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-blue-600 via-teal-500 via-green-500 to-yellow-500 bg-clip-text text-transparent group-hover:from-blue-500 group-hover:via-teal-400 group-hover:via-green-400 group-hover:to-yellow-400 transition-all duration-300 whitespace-nowrap">
-                  Requeza Electric
+                  Riqueza Electric
                 </span>
               </div>
             </Link>

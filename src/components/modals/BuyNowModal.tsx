@@ -283,7 +283,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
           {/* Brand Logo */}
           <div className="absolute top-6 left-6 z-30">
             <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-teal-500 to-yellow-500 bg-clip-text text-transparent drop-shadow-lg">
-              Requeza Electric
+              Riqueza Electric
             </div>
           </div>
 
@@ -462,7 +462,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
                     <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div className="text-xs">
                       <div className="font-semibold">Estimated delivery by 02nd Oct 2025!</div>
-                      <div className="text-purple-100">It's an auspicious day to get your Ola EV delivered</div>
+                      <div className="text-purple-100">It's an auspicious day to get your Riqueza EV delivered</div>
                     </div>
                   </div> */}
                 </div>
@@ -543,7 +543,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
                     <div className="text-sm text-gray-600">
                       {deliveryAddress.addressLine1 ? 
                         `${deliveryAddress.addressLine1}, ${deliveryAddress.city} - ${deliveryAddress.pincode}` : 
-                        'Ola Electric Store, Murlipura'
+                        'Riqueza Electric Store, Murlipura'
                       }
                     </div>
                   </div>
@@ -818,7 +818,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
         onClose={() => setIsPdfModalOpen(false)}
         title="Privacy Policy"
         pdfUrl="/documents/ola-financial-services-privacy-policy.pdf"
-        pdfTitle="OLA Financial Services Privacy Policy"
+        pdfTitle="Riqueza Financial Services Privacy Policy"
       />
 
       {/* PDF Modal - Terms and Conditions */}

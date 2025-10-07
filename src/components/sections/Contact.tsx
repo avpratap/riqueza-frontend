@@ -114,7 +114,7 @@ const Contact = () => {
     {
       icon: MapPin,
       title: "Head Office",
-      details: ["Ola Electric, Koramangala", "Bangalore, Karnataka 560034"],
+      details: ["Riqueza Electric, Koramangala", "Bangalore, Karnataka 560034"],
       color: "from-purple-500 to-purple-600"
     },
     {
@@ -324,7 +324,7 @@ const Contact = () => {
                       Visit Us
                     </h4>
                     <p className="text-blue-100 text-sm sm:text-base">
-                      Requeza Electric, Koramangala<br />
+                      Riqueza Electric, Koramangala<br />
                       Bangalore, Karnataka 560034
                     </p>
                   </div>

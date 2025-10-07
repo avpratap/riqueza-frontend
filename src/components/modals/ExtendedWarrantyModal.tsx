@@ -464,7 +464,7 @@ const ExtendedWarrantyModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, i
         onClose={() => setIsWarrantyTermsModalOpen(false)}
         title="Terms and Conditions"
         pdfUrl="/documents/ola-electric-warranty-terms.pdf"
-        pdfTitle="OLA Electric Warranty Terms and Conditions"
+        pdfTitle="Riqueza Electric Warranty Terms and Conditions"
       />
 
       {/* FAQ Modal */}
@@ -473,7 +473,7 @@ const ExtendedWarrantyModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, i
         onClose={() => setIsFaqModalOpen(false)}
         title="FAQ"
         pdfUrl="/documents/ola-electric-warranty-faq.pdf"
-        pdfTitle="OLA Electric Warranty FAQ"
+        pdfTitle="Riqueza Electric Warranty FAQ"
       />
     </>
   )

@@ -614,7 +614,7 @@ const CheckoutPage = () => {
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                     <span className="text-white font-bold text-sm">R</span>
                   </div>
-                  <h1 className="text-xl font-bold text-gray-900">Requeza Electric</h1>
+                  <h1 className="text-xl font-bold text-gray-900">Riqueza Electric</h1>
                 </div>
                 <div className="text-sm text-gray-500">
                   Step {currentStep} of 4

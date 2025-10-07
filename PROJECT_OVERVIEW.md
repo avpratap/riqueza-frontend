@@ -272,7 +272,7 @@ TWILIO_PHONE_NUMBER=+1234567890
 ## 📊 Sample Data
 
 The database includes:
-- **2 Products**: Requeza S1 Pro+ and S1 Pro
+- **2 Products**: Riqueza S1 Pro+ and S1 Pro
 - **8 Variants**: Different battery capacities (2kWh, 3kWh, 4kWh, 5.2kWh)
 - **8 Colors**: Silver, Passion Red, Stellar Blue, Midnight Blue
 - **12 Images**: Product photos with proper ordering

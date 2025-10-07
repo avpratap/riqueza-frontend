@@ -16,7 +16,7 @@ export interface StoredAuthData {
   timestamp: number
 }
 
-const AUTH_STORAGE_KEY = 'requeza_auth_data'
+const AUTH_STORAGE_KEY = 'riqueza_auth_data'
 const TOKEN_EXPIRY_HOURS = 24 // Token expires after 24 hours
 
 // Save authentication data to localStorage

@@ -20,9 +20,9 @@ const Testimonials = () => {
       role: "Software Engineer",
       city: "Bangalore",
       rating: 5,
-      content: "I've been riding the Ola S1 Pro for 6 months now and it's been an incredible experience. The range is amazing, and the smart features make every ride enjoyable. Highly recommended!",
+      content: "I've been riding the Riqueza S1 Pro for 6 months now and it's been an incredible experience. The range is amazing, and the smart features make every ride enjoyable. Highly recommended!",
       avatar: "/avatars/rahul.jpg",
-      vehicle: "Ola S1 Pro"
+      vehicle: "Riqueza S1 Pro"
     },
     {
       id: 2,
@@ -30,9 +30,9 @@ const Testimonials = () => {
       role: "Marketing Manager",
       city: "Mumbai",
       rating: 5,
-      content: "Switching to electric was the best decision I made. The Ola S1 Air is perfect for city commuting - smooth, quiet, and saves me a lot on fuel costs. The service support is excellent too.",
+      content: "Switching to electric was the best decision I made. The Riqueza S1 Air is perfect for city commuting - smooth, quiet, and saves me a lot on fuel costs. The service support is excellent too.",
       avatar: "/avatars/priya.jpg",
-      vehicle: "Ola S1 Air"
+      vehicle: "Riqueza S1 Air"
     },
     {
       id: 3,
@@ -42,7 +42,7 @@ const Testimonials = () => {
       rating: 4,
       content: "Great performance and build quality. The charging infrastructure is expanding rapidly, making it convenient for daily use. Only giving 4 stars because the app could be more intuitive.",
       avatar: "/avatars/amit.jpg",
-      vehicle: "Ola S1 Pro"
+      vehicle: "Riqueza S1 Pro"
     },
     {
       id: 4,
@@ -50,9 +50,9 @@ const Testimonials = () => {
       role: "Student",
       city: "Pune",
       rating: 5,
-      content: "As a student, the Ola S1 X is perfect for my budget and needs. It's stylish, efficient, and the maintenance costs are minimal. Love the eco-friendly aspect!",
+      content: "As a student, the Riqueza S1 X is perfect for my budget and needs. It's stylish, efficient, and the maintenance costs are minimal. Love the eco-friendly aspect!",
       avatar: "/avatars/neha.jpg",
-      vehicle: "Ola S1 X"
+      vehicle: "Riqueza S1 X"
     },
     {
       id: 5,
@@ -60,9 +60,9 @@ const Testimonials = () => {
       role: "Delivery Partner",
       city: "Chennai",
       rating: 5,
-      content: "I use my Ola scooter for deliveries all day long. The battery life is impressive, and the performance is consistent even after months of heavy usage. Great investment!",
+      content: "I use my Riqueza scooter for deliveries all day long. The battery life is impressive, and the performance is consistent even after months of heavy usage. Great investment!",
       avatar: "/avatars/vikram.jpg",
-      vehicle: "Ola S1 Air"
+      vehicle: "Riqueza S1 Air"
     },
     {
       id: 6,
@@ -72,7 +72,7 @@ const Testimonials = () => {
       rating: 5,
       content: "Perfect for my daily commute to school. The smooth ride and quick charging make it so convenient. Plus, I'm contributing to a cleaner environment!",
       avatar: "/avatars/anjali.jpg",
-      vehicle: "Ola S1 Pro"
+      vehicle: "Riqueza S1 Pro"
     },
     {
       id: 7,
@@ -82,7 +82,7 @@ const Testimonials = () => {
       rating: 4,
       content: "Love the design and performance. The smart features are really helpful. Battery life could be better for long trips, but overall a great purchase!",
       avatar: "/avatars/rohan.jpg",
-      vehicle: "Ola S1 Air"
+      vehicle: "Riqueza S1 Air"
     },
     {
       id: 8,
@@ -92,7 +92,7 @@ const Testimonials = () => {
       rating: 5,
       content: "Reliable and efficient for my hectic schedule. The low maintenance and zero emissions are big plus points. Highly recommend for healthcare professionals!",
       avatar: "/avatars/sneha.jpg",
-      vehicle: "Ola S1 Pro"
+      vehicle: "Riqueza S1 Pro"
     }
   ]
 

@@ -25,7 +25,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">O</span>
               </div>
-              <span className="text-xl font-bold">Ola Electric</span>
+              <span className="text-xl font-bold">Riqueza Electric</span>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
               Leading the electric mobility revolution in India with innovative, 
@@ -143,7 +143,7 @@ const Footer = () => {
         <div className="border-t border-gray-800 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-sm text-gray-400">
-              © 2024 Ola Electric. All rights reserved.
+              © 2024 Riqueza Electric. All rights reserved.
             </div>
             <div className="flex space-x-6 text-sm">
               <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors duration-200">
