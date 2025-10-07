@@ -6,7 +6,6 @@ const nextConfig = {
   },
   env: {
     CUSTOM_KEY: 'riqueza-electric',
-    NEXT_PUBLIC_API_URL: 'https://riqueza-backend.vercel.app',
   },
   // Enable static exports for Vercel
   output: 'standalone',
