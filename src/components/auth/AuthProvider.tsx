@@ -57,7 +57,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
                   
                   // Add a longer delay to prevent rapid calls
                   setTimeout(() => {
-                    dispatch(transferGuestCart()).finally(() => {
+                    dispatch(transferGuestCart() as any).finally(() => {
                       setIsTransferring(false) // Reset transferring flag
                     })
                   }, 1000) // Increased delay to 1 second

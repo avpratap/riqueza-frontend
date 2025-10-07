@@ -3,7 +3,7 @@ import { OrderItem } from './orderService';
 export interface OrderItemWithCategorizedAccessories extends OrderItem {
   addOns?: any[];
   insurance?: any[];
-  accessories?: any[];
+  accessories: any[]; // Make required to match parent interface
   product_name?: string;
   variant_name?: string;
   color_name?: string;

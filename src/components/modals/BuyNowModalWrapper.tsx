@@ -18,7 +18,7 @@ const BuyNowModalWrapper = () => {
     <BuyNowModal
       isOpen={isBuyNowModalOpen}
       onClose={handleClose}
-      product={selectedProduct}
+      product={selectedProduct || undefined}
     />
   )
 }

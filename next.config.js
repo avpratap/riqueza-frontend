@@ -13,12 +13,12 @@ const nextConfig = {
   swcMinify: true,
   // Enable compression
   compress: true,
-  // Skip TypeScript and ESLint checks during build (for faster deployment)
+  // Enable proper TypeScript and ESLint checking for development
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false, // Show TypeScript errors
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false, // Show ESLint errors
   },
 }
 

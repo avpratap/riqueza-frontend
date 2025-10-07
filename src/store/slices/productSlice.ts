@@ -109,9 +109,7 @@ export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async (_, { rejectWithValue }) => {
     try {
-      const API_BASE_URL = process.env.NODE_ENV === 'production' 
-        ? 'https://riqueza-backend.vercel.app/api'
-        : 'http://localhost:5000/api'
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
       const response = await fetch(`${API_BASE_URL}/products`)
       if (!response.ok) {
         throw new Error('Failed to fetch products')
@@ -128,9 +126,7 @@ export const fetchProductById = createAsyncThunk(
   'products/fetchProductById',
   async (id: string, { rejectWithValue }) => {
     try {
-      const API_BASE_URL = process.env.NODE_ENV === 'production' 
-        ? 'https://riqueza-backend.vercel.app/api'
-        : 'http://localhost:5000/api'
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
       const response = await fetch(`${API_BASE_URL}/products/${id}`)
       if (!response.ok) {
         throw new Error('Failed to fetch product')
@@ -147,9 +143,7 @@ export const fetchProductBySlug = createAsyncThunk(
   'products/fetchProductBySlug',
   async (slug: string, { rejectWithValue }) => {
     try {
-      const API_BASE_URL = process.env.NODE_ENV === 'production' 
-        ? 'https://riqueza-backend.vercel.app/api'
-        : 'http://localhost:5000/api'
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
       const response = await fetch(`${API_BASE_URL}/products/slug/${slug}`)
       if (!response.ok) {
         throw new Error('Failed to fetch product')
@@ -166,9 +160,7 @@ export const fetchAccessories = createAsyncThunk(
   'products/fetchAccessories',
   async (_, { rejectWithValue }) => {
     try {
-      const API_BASE_URL = process.env.NODE_ENV === 'production' 
-        ? 'https://riqueza-backend.vercel.app/api'
-        : 'http://localhost:5000/api'
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
       const response = await fetch(`${API_BASE_URL}/products/accessories/all`)
       if (!response.ok) {
         throw new Error('Failed to fetch accessories')

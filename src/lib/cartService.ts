@@ -132,15 +132,16 @@ class CartService {
       } catch (error) {
         console.error('❌ Failed to add item to backend cart:', error);
         console.error('❌ Error details:', {
-          message: error.message,
-          status: error.status,
-          response: error.response
+          message: error instanceof Error ? error.message : 'Unknown error',
+          status: (error as any)?.status,
+          response: (error as any)?.response
         });
         
         // If authentication error, continue with local storage only
-        if (error.message?.includes('Access token required') || 
-            error.message?.includes('Authentication') ||
-            error.message?.includes('already authenticated')) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage?.includes('Access token required') || 
+            errorMessage?.includes('Authentication') ||
+            errorMessage?.includes('already authenticated')) {
           console.log('🔐 Authentication issue detected, using local storage only');
         }
         // Continue with local storage as fallback
@@ -159,7 +160,8 @@ class CartService {
       } catch (error) {
         console.error('❌ Failed to update quantity in backend cart:', error);
         // If authentication error, continue with local storage only
-        if (error.message?.includes('Access token required') || error.message?.includes('Authentication')) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage?.includes('Access token required') || errorMessage?.includes('Authentication')) {
           console.log('User not authenticated, using local storage only');
         }
         // Continue with local storage as fallback
@@ -176,7 +178,9 @@ class CartService {
       } catch (error) {
         console.error('❌ Failed to increment quantity in backend cart:', error);
         // If authentication error, continue with local storage only
-        if (error.message?.includes('Access token required') || error.message?.includes('Authentication')) {
+
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage?.includes('Access token required') || errorMessage?.includes('Authentication')) {
           console.log('User not authenticated, using local storage only');
         }
         // Continue with local storage as fallback
@@ -193,7 +197,8 @@ class CartService {
       } catch (error) {
         console.error('❌ Failed to decrement quantity in backend cart:', error);
         // If authentication error, continue with local storage only
-        if (error.message?.includes('Access token required') || error.message?.includes('Authentication')) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage?.includes('Access token required') || errorMessage?.includes('Authentication')) {
           console.log('User not authenticated, using local storage only');
         }
         // Continue with local storage as fallback
@@ -214,12 +219,13 @@ class CartService {
       } catch (error) {
         console.error('❌ Failed to remove item from backend cart:', error);
         console.error('❌ Error details:', {
-          message: error.message,
-          status: error.status,
-          response: error.response
+          message: error instanceof Error ? error.message : String(error),
+          status: (error as any)?.status,
+          response: (error as any)?.response
         });
         // If authentication error, continue with local storage only
-        if (error.message?.includes('Access token required') || error.message?.includes('Authentication')) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage?.includes('Access token required') || errorMessage?.includes('Authentication')) {
           console.log('User not authenticated, using local storage only');
         }
         // Continue with local storage as fallback
@@ -238,7 +244,8 @@ class CartService {
       } catch (error) {
         console.error('❌ Failed to clear backend cart:', error);
         // If authentication error, continue with local storage only
-        if (error.message?.includes('Access token required') || error.message?.includes('Authentication')) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage?.includes('Access token required') || errorMessage?.includes('Authentication')) {
           console.log('User not authenticated, using local storage only');
         }
         // Continue with local storage as fallback

@@ -61,7 +61,8 @@ const Contact = () => {
     
     try {
       // Submit to backend API
-      const response = await fetch(`${process.env.NODE_ENV === 'production' ? 'https://riqueza-backend.vercel.app' : 'http://localhost:5000'}/api/contact/submit`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000'
+      const response = await fetch(`${API_URL}/api/contact/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
