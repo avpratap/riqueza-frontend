@@ -36,25 +36,30 @@ NEXT_PUBLIC_TWILIO_PHONE_NUMBER=+1234567890
 Set these in Vercel dashboard:
 
 ```
-DB_NAME=riqueza
+DB_NAME=riqueza_db
 DB_USER=your_database_user
 DB_PASSWORD=your_database_password
 DB_HOST=your_database_host
 DB_PORT=5432
-PORT=5000
 NODE_ENV=production
 FRONTEND_URL=https://your-frontend-url.vercel.app
-JWT_SECRET=your_super_secret_jwt_key
+JWT_SECRET=your_super_secret_jwt_key_128_characters
 TWILIO_ACCOUNT_SID=your_twilio_account_sid
 TWILIO_AUTH_TOKEN=your_twilio_auth_token
 TWILIO_PHONE_NUMBER=+1234567890
 ```
 
+**Important Notes:**
+- The backend will automatically deploy to Vercel's serverless functions
+- Make sure all environment variables are set before deploying
+- The database connection uses SSL by default for production
+- CORS is configured to accept requests from `.vercel.app` domains
+
 ### 3. Build Settings for Backend
 - **Framework Preset**: Other
 - **Root Directory**: `./`
-- **Build Command**: `npm run build`
-- **Output Directory**: `./`
+- **Build Command**: `npm install` (or leave empty)
+- **Output Directory**: `.` (or leave empty)
 - **Install Command**: `npm install`
 
 ## 📊 Database Setup
