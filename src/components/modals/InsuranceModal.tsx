@@ -23,11 +23,11 @@ interface InsuranceModalProps {
 
 // Move data outside component to avoid initialization issues
 const insuranceProviders = [
-  { id: 'digit', name: 'DIGIT', logo: 'https://dyu8p57rmh62v.cloudfront.net/FullKycUI/insurance/ev/purchase/digit.svg' },
-  { id: 'icici', name: 'ICICI LOMBARD', logo: 'https://dyu8p57rmh62v.cloudfront.net/FullKycUI/insurance/ev/purchase/iciciLombard.svg' },
-  { id: 'bajaj', name: 'BAJAJ ALLIANZ', logo: 'https://dyu8p57rmh62v.cloudfront.net/FullKycUI/insurance/ev/purchase/bajaj_allianz.svg' },
-  { id: 'reliance', name: 'RELIANCE', logo: 'https://dyu8p57rmh62v.cloudfront.net/FullKycUI/insurance/ev/purchase/RIG.svg' },
-  { id: 'tata', name: 'TATA AIG', logo: 'https://dyu8p57rmh62v.cloudfront.net/FullKycUI/insurance/ev/purchase/TATA_AIG.svg' }
+  { id: 'digit', name: 'DIGIT', logo: 'https://res.cloudinary.com/dnulm62j6/image/upload/v1763108542/download_vmziiy.jpg' },
+  { id: 'icici', name: 'ICICI LOMBARD', logo: 'https://res.cloudinary.com/dnulm62j6/image/upload/v1763108677/download_vkwp6x.png' },
+  { id: 'bajaj', name: 'BAJAJ ALLIANZ', logo: 'https://res.cloudinary.com/dnulm62j6/image/upload/v1763108728/download_1_nwila2.jpg' },
+  { id: 'reliance', name: 'RELIANCE', logo: 'https://res.cloudinary.com/dnulm62j6/image/upload/v1763108788/download_2_qykh7o.jpg' },
+  { id: 'tata', name: 'TATA AIG', logo: 'https://res.cloudinary.com/dnulm62j6/image/upload/v1763108839/download_3_wftfrp.jpg' }
 ]
 
 // Damage plans data for each provider
@@ -391,11 +391,21 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
         <div className="w-full h-full flex flex-col bg-white" style={{ backgroundColor: '#ffffff' }}>
           {/* Back Button */}
           <div className="absolute top-4 left-4 z-10">
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full flex items-center justify-center">
               <img 
                 src="https://assets.olaelectric.com/olaelectric-videos/configs-static/overlay-config-json/olaTechPack/backButton.svg"
                 alt="back"
                 className="w-6 h-6"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  if (!target.nextElementSibling) {
+                    const fallback = document.createElement('div');
+                    fallback.className = 'w-6 h-6 flex items-center justify-center text-gray-600 text-xl font-bold';
+                    fallback.innerHTML = '←';
+                    target.parentElement?.appendChild(fallback);
+                  }
+                }}
               />
             </button>
           </div>
@@ -418,13 +428,25 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
               <div className="flex items-center mb-2">
                 <span className="text-sm text-gray-600">5 year Own Damage + 5 year Third Party</span>
                 <button
+                  type="button"
                   onClick={() => setIsInfoModalOpen(true)}
-                  className="ml-2 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  className="ml-2 p-1 hover:bg-gray-100 rounded-full transition-colors flex items-center justify-center"
+                  aria-label="Insurance information"
                 >
                   <img
                     src="https://dyu8p57rmh62v.cloudfront.net/FullKycUI/insurance/ev/common/info-ev-insurance.svg"
                     className="w-4 h-4"
                     alt="info"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      if (!target.nextElementSibling) {
+                        const fallback = document.createElement('div');
+                        fallback.className = 'w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold';
+                        fallback.textContent = 'i';
+                        target.parentElement?.appendChild(fallback);
+                      }
+                    }}
                   />
                 </button>
               </div>
@@ -449,7 +471,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
                 {insuranceProviders.map((provider) => (
                   <div
                     key={provider.id}
-                    className={`flex-shrink-0 w-12 h-12 rounded-full border-2 cursor-pointer transition-all duration-200 ${
+                    className={`flex-shrink-0 w-12 h-12 rounded-full border-2 cursor-pointer transition-all duration-200 flex items-center justify-center ${
                       selectedProvider === provider.id
                         ? 'border-green-500 bg-green-50'
                         : 'border-gray-200 hover:border-gray-300'
@@ -459,7 +481,21 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
                     <img
                       src={provider.logo}
                       alt={provider.name}
-                      className="w-full h-full rounded-full object-contain p-1"
+                      className="w-10 h-10 rounded-full object-contain"
+                      loading="lazy"
+                      crossOrigin="anonymous"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        // Fallback to text if image fails
+                        target.style.display = 'none';
+                        const container = target.parentElement;
+                        if (container && !container.querySelector('.fallback-text')) {
+                          const fallback = document.createElement('div');
+                          fallback.className = 'fallback-text w-full h-full flex items-center justify-center text-xs font-bold text-gray-600';
+                          fallback.textContent = provider.name.split(' ')[0];
+                          container.appendChild(fallback);
+                        }
+                      }}
                     />
                   </div>
                 ))}
@@ -506,12 +542,22 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
                       e.stopPropagation()
                       setIsAddOnsInfoModalOpen(true)
                     }}
-                    className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                    className="p-1 hover:bg-gray-100 rounded-full transition-colors flex items-center justify-center"
                   >
                     <img
                       src="https://dyu8p57rmh62v.cloudfront.net/FullKycUI/insurance/ev/common/info-ev-insurance.svg"
                       className="w-4 h-4"
                       alt="info"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        if (!target.nextElementSibling) {
+                          const fallback = document.createElement('div');
+                          fallback.className = 'w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold';
+                          fallback.textContent = 'i';
+                          target.parentElement?.appendChild(fallback);
+                        }
+                      }}
                     />
                   </button>
                 </div>
@@ -520,36 +566,43 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
 
               {showAddOns && (
                 <div className="space-y-3">
-                  {addOnsData.map((addon) => (
-                    <div
-                      key={addon.id}
-                      className="bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors"
-                      onClick={() => handleAddOnToggle(addon.id)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-6 h-6 flex items-center justify-center">
-                            {selectedAddOns[addon.id as keyof typeof selectedAddOns] ? (
-                              <img
-                                src="https://dyu8p57rmh62v.cloudfront.net/FullKycUI/insurance/ev/common/checked.svg"
-                                alt="checked"
-                                className="w-6 h-6"
-                              />
-                            ) : (
-                              <div className="w-6 h-6 border-2 border-gray-300 rounded"></div>
-                            )}
+                  {addOnsData.map((addon) => {
+                    const isSelected = selectedAddOns[addon.id as keyof typeof selectedAddOns] || false;
+                    return (
+                      <div
+                        key={addon.id}
+                        className="bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleAddOnToggle(addon.id);
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3 flex-1">
+                            <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                              {isSelected ? (
+                                <div className="w-6 h-6 rounded bg-green-500 flex items-center justify-center">
+                                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </div>
+                              ) : (
+                                <div className="w-6 h-6 border-2 border-gray-300 rounded flex-shrink-0 bg-white"></div>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-medium text-gray-900">{addon.title}</div>
+                              <div className="text-sm text-gray-600">{addon.description}</div>
+                            </div>
                           </div>
-                          <div>
-                            <div className="font-medium text-gray-900">{addon.title}</div>
-                            <div className="text-sm text-gray-600">{addon.description}</div>
+                          <div className="font-semibold text-gray-900 ml-3">
+                            ₹{addon.price}
                           </div>
-                        </div>
-                        <div className="font-semibold text-gray-900">
-                          ₹{addon.price}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -567,38 +620,45 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
               </div>
 
               <div className="space-y-4">
-                {additionalCoverData.map((cover) => (
-                  <div
-                    key={cover.id}
-                    className="bg-gray-50 border border-gray-200 rounded-lg p-3 cursor-pointer hover:bg-gray-100 transition-colors"
-                    onClick={() => toggleAddOn(cover.id)}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3 flex-1">
-                        <div className="w-6 h-6 flex items-center justify-center mt-1">
-                          {selectedAddOns[cover.id as keyof typeof selectedAddOns] ? (
-                            <img
-                              src="https://dyu8p57rmh62v.cloudfront.net/FullKycUI/insurance/ev/common/checked.svg"
-                              alt="checked"
-                              className="w-6 h-6"
-                            />
-                          ) : (
-                            <div className="w-6 h-6 border-2 border-gray-300 rounded"></div>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium text-gray-900 mb-1">{cover.title}</div>
-                          <div className="text-sm text-gray-600">
-                            {cover.description}
+                {additionalCoverData.map((cover) => {
+                  const isSelected = selectedAddOns[cover.id as keyof typeof selectedAddOns] || false;
+                  return (
+                    <div
+                      key={cover.id}
+                      className="bg-gray-50 border border-gray-200 rounded-lg p-3 cursor-pointer hover:bg-gray-100 transition-colors"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleAddOn(cover.id);
+                      }}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-3 flex-1">
+                          <div className="w-6 h-6 flex items-center justify-center mt-1 flex-shrink-0">
+                            {isSelected ? (
+                              <div className="w-6 h-6 rounded bg-green-500 flex items-center justify-center">
+                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                              </div>
+                            ) : (
+                              <div className="w-6 h-6 border-2 border-gray-300 rounded flex-shrink-0 bg-white"></div>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900 mb-1">{cover.title}</div>
+                            <div className="text-sm text-gray-600">
+                              {cover.description}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="font-bold text-gray-900 ml-3">
-                        ₹{cover.price}
+                        <div className="font-bold text-gray-900 ml-3">
+                          ₹{cover.price}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -678,7 +738,8 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
                     name: `${insuranceProviders.find(p => p.id === selectedProvider)?.name} Insurance - ${selectedPlan}`,
                     description: `Insurance coverage with ${selectedProvider} for ${selectedPlan}`,
                     price: calculateTotal(),
-                    image_url: '/images/placeholder.png'
+                    image_url: '/images/placeholder.png',
+                    type: 'insurance'
                   }
                   
                   // Combine selected accessories with insurance
@@ -694,21 +755,27 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
                   
                   console.log('✅ Added to Redux cart, now syncing with backend...')
                   
-                  // Directly call backend API and wait for response
-                  const { cartApi } = await import('@/lib/cartApi')
-                  const accessoryPrice = allAccessories.reduce((sum, acc) => sum + acc.price, 0)
-                  const totalPrice = variant.price + accessoryPrice
+                  // Wait a bit for Redux state to update
+                  await new Promise(resolve => setTimeout(resolve, 200))
                   
-                  await cartApi.addToCart({
-                    product_id: selectedProduct.id,
-                    variant_id: variant.id,
-                    color_id: color.id,
-                    quantity: 1,
-                    accessories: allAccessories,
-                    total_price: totalPrice
+                  // Get current cart state from Redux to sync
+                  const { useSelector } = await import('react-redux')
+                  const { cartApi } = await import('@/lib/cartApi')
+                  const { cartService } = await import('@/lib/cartService')
+                  const { store } = await import('@/store/store')
+                  
+                  const cartState = store.getState().cart
+                  console.log('📦 Syncing entire cart to backend before checkout...', {
+                    itemCount: cartState.items.length
                   })
                   
-                  console.log('✅ Backend sync complete, navigating to checkout...')
+                  // Sync entire cart state to backend before navigation
+                  await cartService.syncEntireCartToBackend(cartState.items)
+                  
+                  console.log('✅ Cart synced successfully, navigating to checkout...')
+                  
+                  // Small delay to ensure backend has processed
+                  await new Promise(resolve => setTimeout(resolve, 300))
                   
                   // Close modals
                   dispatch(closeBuyNowModal())
@@ -720,6 +787,8 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
                 } catch (error) {
                   console.error('❌ Error during checkout process:', error)
                   // Still navigate to checkout, item is in Redux at least
+                  dispatch(closeBuyNowModal())
+                  onClose()
                   window.location.href = '/checkout'
                 }
               }}
@@ -749,11 +818,21 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
       >
         {/* Back Button */}
         <div className="absolute top-4 left-4 z-10">
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full flex items-center justify-center">
             <img 
               src="https://assets.olaelectric.com/olaelectric-videos/configs-static/overlay-config-json/olaTechPack/backButton.svg"
               alt="back"
               className="w-6 h-6"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                if (!target.nextElementSibling) {
+                  const fallback = document.createElement('div');
+                  fallback.className = 'w-6 h-6 flex items-center justify-center text-gray-600';
+                  fallback.innerHTML = '←';
+                  target.parentElement?.appendChild(fallback);
+                }
+              }}
             />
           </button>
         </div>
@@ -776,13 +855,25 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
             <div className="flex items-center mb-2">
               <span className="text-sm text-gray-600">5 year Own Damage + 5 year Third Party</span>
               <button
+                type="button"
                 onClick={() => setIsInfoModalOpen(true)}
-                className="ml-2 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                className="ml-2 p-1 hover:bg-gray-100 rounded-full transition-colors flex items-center justify-center"
+                aria-label="Insurance information"
               >
                 <img
                   src="https://dyu8p57rmh62v.cloudfront.net/FullKycUI/insurance/ev/common/info-ev-insurance.svg"
                   className="w-4 h-4"
                   alt="info"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    if (!target.nextElementSibling) {
+                      const fallback = document.createElement('div');
+                      fallback.className = 'w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold';
+                      fallback.textContent = 'i';
+                      target.parentElement?.appendChild(fallback);
+                    }
+                  }}
                 />
               </button>
             </div>
@@ -807,7 +898,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
               {insuranceProviders.map((provider) => (
                 <div
                   key={provider.id}
-                  className={`flex-shrink-0 w-12 h-12 rounded-full border-2 cursor-pointer transition-all duration-200 ${
+                  className={`flex-shrink-0 w-12 h-12 rounded-full border-2 cursor-pointer transition-all duration-200 flex items-center justify-center ${
                     selectedProvider === provider.id
                       ? 'border-green-500 bg-green-50'
                       : 'border-gray-200 hover:border-gray-300'
@@ -817,7 +908,18 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
                   <img
                     src={provider.logo}
                     alt={provider.name}
-                    className="w-full h-full rounded-full object-contain p-1"
+                    className="w-10 h-10 rounded-full object-contain"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      // Fallback to text if image fails
+                      target.style.display = 'none';
+                      if (!target.nextElementSibling) {
+                        const fallback = document.createElement('div');
+                        fallback.className = 'w-full h-full flex items-center justify-center text-xs font-bold text-gray-600';
+                        fallback.textContent = provider.name.split(' ')[0];
+                        target.parentElement?.appendChild(fallback);
+                      }
+                    }}
                   />
                 </div>
               ))}
@@ -864,12 +966,22 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
                     e.stopPropagation()
                     setIsAddOnsInfoModalOpen(true)
                   }}
-                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-1 hover:bg-gray-100 rounded-full transition-colors flex items-center justify-center"
                 >
                   <img
                     src="https://dyu8p57rmh62v.cloudfront.net/FullKycUI/insurance/ev/common/info-ev-insurance.svg"
                     className="w-4 h-4"
                     alt="info"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      if (!target.nextElementSibling) {
+                        const fallback = document.createElement('div');
+                        fallback.className = 'w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold';
+                        fallback.textContent = 'i';
+                        target.parentElement?.appendChild(fallback);
+                      }
+                    }}
                   />
                 </button>
               </div>
@@ -878,36 +990,43 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
 
             {showAddOns && (
               <div className="space-y-3">
-                {addOnsData.map((addon) => (
-                  <div
-                    key={addon.id}
-                    className="bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors"
-                    onClick={() => handleAddOnToggle(addon.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 flex items-center justify-center">
-                          {selectedAddOns[addon.id as keyof typeof selectedAddOns] ? (
-                            <img
-                              src="https://dyu8p57rmh62v.cloudfront.net/FullKycUI/insurance/ev/common/checked.svg"
-                              alt="checked"
-                              className="w-6 h-6"
-                            />
-                          ) : (
-                            <div className="w-6 h-6 border-2 border-gray-300 rounded"></div>
-                          )}
+                {addOnsData.map((addon) => {
+                  const isSelected = selectedAddOns[addon.id as keyof typeof selectedAddOns] || false;
+                  return (
+                    <div
+                      key={addon.id}
+                      className="bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleAddOnToggle(addon.id);
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                            {isSelected ? (
+                              <div className="w-6 h-6 rounded bg-green-500 flex items-center justify-center">
+                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                              </div>
+                            ) : (
+                              <div className="w-6 h-6 border-2 border-gray-300 rounded flex-shrink-0 bg-white"></div>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900">{addon.title}</div>
+                            <div className="text-sm text-gray-600">{addon.description}</div>
+                          </div>
                         </div>
-                        <div>
-                          <div className="font-medium text-gray-900">{addon.title}</div>
-                          <div className="text-sm text-gray-600">{addon.description}</div>
+                        <div className="font-semibold text-gray-900 ml-3">
+                          ₹{addon.price}
                         </div>
-                      </div>
-                      <div className="font-semibold text-gray-900">
-                        ₹{addon.price}
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -925,38 +1044,45 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
             </div>
 
             <div className="space-y-4">
-              {additionalCoverData.map((cover) => (
-                <div
-                  key={cover.id}
-                  className="bg-gray-50 border border-gray-200 rounded-lg p-3 cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => toggleAddOn(cover.id)}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3 flex-1">
-                      <div className="w-6 h-6 flex items-center justify-center mt-1">
-                        {selectedAddOns[cover.id as keyof typeof selectedAddOns] ? (
-                          <img
-                            src="https://dyu8p57rmh62v.cloudfront.net/FullKycUI/insurance/ev/common/checked.svg"
-                            alt="checked"
-                            className="w-6 h-6"
-                          />
-                        ) : (
-                          <div className="w-6 h-6 border-2 border-gray-300 rounded"></div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900 mb-1">{cover.title}</div>
-                        <div className="text-sm text-gray-600">
-                          {cover.description}
+              {additionalCoverData.map((cover) => {
+                const isSelected = selectedAddOns[cover.id as keyof typeof selectedAddOns] || false;
+                return (
+                  <div
+                    key={cover.id}
+                    className="bg-gray-50 border border-gray-200 rounded-lg p-3 cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleAddOn(cover.id);
+                    }}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="w-6 h-6 flex items-center justify-center mt-1 flex-shrink-0">
+                          {isSelected ? (
+                            <div className="w-6 h-6 rounded bg-green-500 flex items-center justify-center">
+                              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                          ) : (
+                            <div className="w-6 h-6 border-2 border-gray-300 rounded flex-shrink-0 bg-white"></div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-900 mb-1">{cover.title}</div>
+                          <div className="text-sm text-gray-600">
+                            {cover.description}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="font-bold text-gray-900 ml-3">
-                      ₹{cover.price}
+                      <div className="font-bold text-gray-900 ml-3">
+                        ₹{cover.price}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -1036,7 +1162,8 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
               name: `${insuranceProviders.find(p => p.id === selectedProvider)?.name} Insurance - ${selectedPlan}`,
               description: `Insurance coverage with ${selectedProvider} for ${selectedPlan}`,
               price: calculateTotal(),
-              image_url: '/images/placeholder.png'
+              image_url: '/images/placeholder.png',
+              type: 'insurance'
             }
             
             // Combine selected accessories with insurance
@@ -1052,21 +1179,25 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
             
             console.log('✅ Added to Redux cart, now syncing with backend...')
             
-            // Directly call backend API and wait for response
-            const { cartApi } = await import('@/lib/cartApi')
-            const accessoryPrice = allAccessories.reduce((sum, acc) => sum + acc.price, 0)
-            const totalPrice = variant.price + accessoryPrice
+            // Wait a bit for Redux state to update
+            await new Promise(resolve => setTimeout(resolve, 200))
             
-            await cartApi.addToCart({
-              product_id: selectedProduct.id,
-              variant_id: variant.id,
-              color_id: color.id,
-              quantity: 1,
-              accessories: allAccessories,
-              total_price: totalPrice
+            // Get current cart state from Redux to sync
+            const { cartService } = await import('@/lib/cartService')
+            const { store } = await import('@/store/store')
+            
+            const cartState = store.getState().cart
+            console.log('📦 Syncing entire cart to backend before checkout...', {
+              itemCount: cartState.items.length
             })
             
-            console.log('✅ Backend sync complete, navigating to checkout...')
+            // Sync entire cart state to backend before navigation
+            await cartService.syncEntireCartToBackend(cartState.items)
+            
+            console.log('✅ Cart synced successfully, navigating to checkout...')
+            
+            // Small delay to ensure backend has processed
+            await new Promise(resolve => setTimeout(resolve, 300))
             
             // Close modals
             dispatch(closeBuyNowModal())

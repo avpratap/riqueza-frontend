@@ -283,64 +283,58 @@ const cartSlice = createSlice({
     },
     
     removeFromCart: (state, action: PayloadAction<string>) => {
-      const databaseId = action.payload
+      const searchId = action.payload // Can be databaseId (UUID) or frontendId (concatenated string)
       
-      console.log('🔍 Redux removeFromCart called with:', databaseId);
+      console.log('🔍 Redux removeFromCart called with:', searchId);
       console.log('📋 Current cart items:', state.items.map(item => ({
         frontendId: item.id,
         databaseId: (item as any)?.databaseId,
         productName: item.product?.name
       })));
       
-      // Try to find by database ID first, then by frontend ID
-      let itemIndex = state.items.findIndex(item => {
-        const itemDatabaseId = (item as any)?.databaseId;
-        const matches = itemDatabaseId == databaseId || itemDatabaseId === databaseId || String(itemDatabaseId) === String(databaseId);
-        console.log('🔍 Checking item:', { 
-          frontendId: item.id, 
-          databaseId: itemDatabaseId, 
-          searchId: databaseId,
-          matches,
-          typeMatch: typeof itemDatabaseId === typeof databaseId
-        });
-        return matches;
-      });
+      // Check if searchId looks like a UUID (standard UUID format: 8-4-4-4-12 hex characters)
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(searchId);
       
-      if (itemIndex === -1) {
-        console.log('🔍 Database ID not found, trying frontend ID...');
-        // Fallback to frontend ID search
+      let itemIndex = -1;
+      let actualDatabaseId: string | undefined;
+      
+      if (isUUID) {
+        // Search by database ID (UUID format)
         itemIndex = state.items.findIndex(item => {
-          const matches = item.id === databaseId;
-          console.log('🔍 Checking frontend ID:', { 
-            frontendId: item.id, 
-            searchId: databaseId, 
-            matches 
-          });
+          const itemDatabaseId = (item as any)?.databaseId;
+          const matches = itemDatabaseId && (
+            itemDatabaseId === searchId || 
+            String(itemDatabaseId) === String(searchId) ||
+            itemDatabaseId?.toString() === searchId.toString()
+          );
+          if (matches) {
+            actualDatabaseId = itemDatabaseId;
+          }
           return matches;
         });
       }
       
-      // If still not found, try to find by parsing the database ID as a number
-      if (itemIndex === -1 && !isNaN(Number(databaseId))) {
-        console.log('🔍 Trying numeric database ID search...');
+      if (itemIndex === -1) {
+        // Fallback to frontend ID search (concatenated string)
+        console.log('🔍 Database ID not found, trying frontend ID...');
         itemIndex = state.items.findIndex(item => {
-          const itemDatabaseId = (item as any)?.databaseId;
-          const matches = Number(itemDatabaseId) === Number(databaseId);
-          console.log('🔍 Checking numeric ID:', { 
-            frontendId: item.id, 
-            databaseId: itemDatabaseId, 
-            searchId: databaseId, 
-            matches 
-          });
+          const matches = item.id === searchId;
+          if (matches) {
+            actualDatabaseId = (item as any)?.databaseId;
+          }
           return matches;
         });
       }
       
       if (itemIndex >= 0) {
         const itemToRemove = state.items[itemIndex]
+        const databaseIdToUse = actualDatabaseId || (itemToRemove as any)?.databaseId || searchId;
+        
         console.log('🗑️ Removing item from cart:', {
           frontendId: itemToRemove.id,
-          databaseId: (itemToRemove as any)?.databaseId,
+          databaseId: databaseIdToUse,
+          searchId,
+          isUUID: isUUID,
           productName: itemToRemove.product?.name
         });
         
@@ -370,26 +364,40 @@ const cartSlice = createSlice({
           console.error('❌ Failed to update localStorage:', error);
         }
         
-        // Sync with backend using the database ID
-        setTimeout(() => {
-          try {
-            cartService.removeFromCart(databaseId).catch(error => {
-              console.error('❌ Cart service remove error:', error);
-            });
-          } catch (error) {
-            console.error('❌ Cart service remove sync error:', error);
-          }
-        }, 100);
+        // Sync with backend using the actual database ID (must be valid UUID format)
+        if (databaseIdToUse && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(databaseIdToUse))) {
+          setTimeout(() => {
+            try {
+              cartService.removeFromCart(String(databaseIdToUse)).catch(error => {
+                console.error('❌ Cart service remove error:', error);
+              });
+            } catch (error) {
+              console.error('❌ Cart service remove sync error:', error);
+            }
+          }, 0);
+        } else {
+          console.error('❌ Cannot sync removal to backend - invalid or missing database ID:', {
+            databaseId: databaseIdToUse,
+            searchId,
+            itemId: itemToRemove.id
+          });
+          // For guest users with composite IDs, try anyway - backend might handle it
+          setTimeout(() => {
+            try {
+              cartService.removeFromCart(String(databaseIdToUse)).catch(error => {
+                console.error('❌ Cart service remove error (guest composite ID):', error);
+              });
+            } catch (error) {
+              console.error('❌ Cart service remove sync error:', error);
+            }
+          }, 0);
+        }
       } else {
-        console.error('❌ Item not found for removal:', databaseId);
-        console.error('❌ Available items:', state.items.map(item => ({
-          frontendId: item.id,
-          databaseId: (item as any)?.databaseId
-        })));
+        console.error('❌ Item not found in cart for removal:', searchId);
       }
     },
     
-    updateQuantity: (state, action: PayloadAction<{ itemId: string; quantity: number; databaseId?: number }>) => {
+    updateQuantity: (state, action: PayloadAction<{ itemId: string; quantity: number; databaseId?: string }>) => {
       const { itemId, quantity, databaseId } = action.payload
       const itemIndex = state.items.findIndex(item => item.id === itemId)
       
@@ -417,20 +425,47 @@ const cartSlice = createSlice({
           itemsCount: state.items.length 
         });
         
-        // Sync with backend
-        setTimeout(() => {
-          try {
-            cartService.updateQuantity(itemId, quantity, databaseId).catch(error => {
+        // Sync with backend immediately (fire and forget, but sync right away)
+        // For guest users, databaseId might be the itemId itself if it's a UUID
+        // Try to sync with databaseId if available, otherwise try with itemId
+        const idToUse = databaseId || itemId;
+        const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(idToUse));
+        
+        if (isValidUUID) {
+          const idString = String(idToUse);
+          // Use requestIdleCallback if available, otherwise setTimeout with 0
+          if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+            (window as any).requestIdleCallback(() => {
+              cartService.updateQuantity(itemId, quantity, idString).catch(error => {
+                console.error('❌ Cart service update quantity error:', error);
+              });
+            }, { timeout: 500 });
+          } else {
+            setTimeout(() => {
+              cartService.updateQuantity(itemId, quantity, idString).catch(error => {
+                console.error('❌ Cart service update quantity error:', error);
+              });
+            }, 0);
+          }
+        } else {
+          // For guest users, itemId might be a composite ID, which is okay
+          // Still try to sync - cartService will handle it gracefully
+          console.log('⚠️ Item ID is not a UUID format (might be guest composite ID):', {
+            databaseId,
+            itemId,
+            idToUse
+          });
+          // Try anyway - cartService will handle gracefully
+          setTimeout(() => {
+            cartService.updateQuantity(itemId, quantity, idToUse).catch(error => {
               console.error('❌ Cart service update quantity error:', error);
             });
-          } catch (error) {
-            console.error('❌ Cart service update quantity sync error:', error);
-          }
-        }, 100);
+          }, 0);
+        }
       }
     },
     
-    incrementQuantity: (state, action: PayloadAction<{ itemId: string; databaseId?: number }>) => {
+    incrementQuantity: (state, action: PayloadAction<{ itemId: string; databaseId?: string }>) => {
       const { itemId, databaseId } = action.payload
       const itemIndex = state.items.findIndex(item => item.id === itemId)
       
@@ -446,58 +481,164 @@ const cartSlice = createSlice({
         
         console.log('✅ Incremented quantity for item:', item);
         
-        // Sync with backend
-        setTimeout(() => {
-          try {
-            cartService.incrementQuantity(itemId, databaseId).catch(error => {
+        // Sync with backend immediately (fire and forget, but sync right away)
+        // For guest users, databaseId might be the itemId itself if it's a UUID
+        const idToUse = databaseId || itemId;
+        const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(idToUse));
+        
+        if (isValidUUID) {
+          const idString = String(idToUse);
+          // Use requestIdleCallback if available, otherwise setTimeout with 0
+          if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+            (window as any).requestIdleCallback(() => {
+              cartService.incrementQuantity(itemId, idString).catch(error => {
+                console.error('❌ Cart service increment error:', error);
+              });
+            }, { timeout: 500 });
+          } else {
+            setTimeout(() => {
+              cartService.incrementQuantity(itemId, idString).catch(error => {
+                console.error('❌ Cart service increment error:', error);
+              });
+            }, 0);
+          }
+        } else {
+          // For guest users, try anyway - cartService will handle gracefully
+          setTimeout(() => {
+            cartService.incrementQuantity(itemId, idToUse).catch(error => {
               console.error('❌ Cart service increment error:', error);
             });
-          } catch (error) {
-            console.error('❌ Cart service increment sync error:', error);
-          }
-        }, 100);
+          }, 0);
+        }
       }
     },
     
-    decrementQuantity: (state, action: PayloadAction<{ itemId: string; databaseId?: number }>) => {
+    decrementQuantity: (state, action: PayloadAction<{ itemId: string; databaseId?: string }>) => {
       const { itemId, databaseId } = action.payload
       const itemIndex = state.items.findIndex(item => item.id === itemId)
       
       if (itemIndex >= 0) {
         const item = state.items[itemIndex]
+        const idToUse = databaseId || itemId;
         
         if (item.quantity <= 1) {
           // Remove item if quantity would be 0 or less
           console.log('🗑️ Removing item due to decrement to zero:', item);
+          
+          // Store the database ID before removing
+          const actualDatabaseId = (item as any)?.databaseId || idToUse;
+          
           state.items.splice(itemIndex, 1)
+          
+          // Update totals
+          state.totalItems = state.items.reduce((sum, item) => sum + item.quantity, 0)
+          state.totalPrice = state.items.reduce((sum, item) => sum + item.totalPrice, 0)
+          
+          console.log('📊 Updated cart totals after removal:', { 
+            totalItems: state.totalItems, 
+            totalPrice: state.totalPrice,
+            itemsCount: state.items.length 
+          });
+          
+          // Sync with localStorage immediately
+          try {
+            const cartState = {
+              items: state.items,
+              totalItems: state.totalItems,
+              totalPrice: state.totalPrice,
+              lastUpdated: Date.now()
+            };
+            localStorage.setItem('cartState', JSON.stringify(cartState));
+            console.log('💾 Updated localStorage with new cart state');
+          } catch (error) {
+            console.error('❌ Failed to update localStorage:', error);
+          }
+          
+          // Use removeFromCart service instead of decrementQuantity for removal
+          const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(actualDatabaseId));
+          
+          if (isValidUUID) {
+            setTimeout(() => {
+              try {
+                cartService.removeFromCart(String(actualDatabaseId)).catch(error => {
+                  console.error('❌ Cart service remove error:', error);
+                });
+              } catch (error) {
+                console.error('❌ Cart service remove sync error:', error);
+              }
+            }, 0);
+          } else {
+            // For guest users, try anyway - cartService will handle gracefully
+            setTimeout(() => {
+              try {
+                cartService.removeFromCart(String(actualDatabaseId)).catch(error => {
+                  console.error('❌ Cart service remove error:', error);
+                });
+              } catch (error) {
+                console.error('❌ Cart service remove sync error:', error);
+              }
+            }, 0);
+          }
         } else {
           // Decrement quantity and recalculate total price
           const unitPrice = item.totalPrice / item.quantity
           item.quantity -= 1
           item.totalPrice = unitPrice * item.quantity
           console.log('✅ Decremented quantity for item:', item);
-        }
-        
-        // Update totals
-        state.totalItems = state.items.reduce((sum, item) => sum + item.quantity, 0)
-        state.totalPrice = state.items.reduce((sum, item) => sum + item.totalPrice, 0)
-        
-        console.log('📊 Updated cart totals after decrement:', { 
-          totalItems: state.totalItems, 
-          totalPrice: state.totalPrice,
-          itemsCount: state.items.length 
-        });
-        
-        // Sync with backend
-        setTimeout(() => {
+          
+          // Update totals
+          state.totalItems = state.items.reduce((sum, item) => sum + item.quantity, 0)
+          state.totalPrice = state.items.reduce((sum, item) => sum + item.totalPrice, 0)
+          
+          console.log('📊 Updated cart totals after decrement:', { 
+            totalItems: state.totalItems, 
+            totalPrice: state.totalPrice,
+            itemsCount: state.items.length 
+          });
+          
+          // Sync with localStorage immediately
           try {
-            cartService.decrementQuantity(itemId, databaseId).catch(error => {
-              console.error('❌ Cart service decrement error:', error);
-            });
+            const cartState = {
+              items: state.items,
+              totalItems: state.totalItems,
+              totalPrice: state.totalPrice,
+              lastUpdated: Date.now()
+            };
+            localStorage.setItem('cartState', JSON.stringify(cartState));
+            console.log('💾 Updated localStorage with new cart state');
           } catch (error) {
-            console.error('❌ Cart service decrement sync error:', error);
+            console.error('❌ Failed to update localStorage:', error);
           }
-        }, 100);
+          
+          // Sync with backend immediately (fire and forget, but sync right away)
+          // For guest users, databaseId might be the itemId itself if it's a UUID
+          const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(idToUse));
+          
+          if (isValidUUID) {
+            const idString = String(idToUse);
+            // Use requestIdleCallback if available, otherwise setTimeout with 0
+            if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+              (window as any).requestIdleCallback(() => {
+                cartService.decrementQuantity(itemId, idString).catch(error => {
+                  console.error('❌ Cart service decrement error:', error);
+                });
+              }, { timeout: 500 });
+            } else {
+              setTimeout(() => {
+                cartService.decrementQuantity(itemId, idString).catch(error => {
+                  console.error('❌ Cart service decrement error:', error);
+                });
+              }, 0);
+            }
+          } else {
+            // For guest users, try anyway - cartService will handle gracefully
+            setTimeout(() => {
+              cartService.decrementQuantity(itemId, idToUse).catch(error => {
+                console.error('❌ Cart service decrement error:', error);
+              });
+            }, 0);
+          }
+        }
       }
     },
     

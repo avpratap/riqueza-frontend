@@ -24,12 +24,43 @@ class CartTransferService {
       
       console.log('✅ Cart transfer result:', result);
       
-      return {
-        success: true,
-        message: result.message,
-        data: result.data
-      };
+      // If result indicates no items to transfer, that's still success
+      if (result.success) {
+        const itemsTransferred = result.data?.itemsTransferred || 0;
+        if (itemsTransferred === 0) {
+          console.log('ℹ️ No guest cart items to transfer (this is okay)');
+        }
+        return {
+          success: true,
+          message: result.message || 'Cart transfer completed',
+          data: result.data
+        };
+      } else {
+        // If error indicates no items, treat as success
+        if (result.error?.includes('not found') || result.error?.includes('not needed')) {
+          console.log('ℹ️ No guest cart items found (this is okay):', result.error);
+          return {
+            success: true,
+            message: 'No guest cart items to transfer',
+            data: { itemsTransferred: 0 }
+          };
+        }
+        return {
+          success: false,
+          message: result.error || 'Failed to transfer cart',
+          error: result.error || 'Unknown error'
+        };
+      }
     } catch (error: any) {
+      // Handle 404 and "not found" errors gracefully
+      if (error.status === 404 || error.message?.includes('not found') || error.message?.includes('404')) {
+        console.log('ℹ️ Guest cart not found or already transferred (this is okay):', error.message);
+        return {
+          success: true,
+          message: 'No guest cart items to transfer',
+          data: { itemsTransferred: 0 }
+        };
+      }
       console.error('❌ Cart transfer failed:', error);
       
       return {

@@ -127,10 +127,10 @@ const ChooseYourPro = ({ product }: ChooseYourProProps) => {
         </h2>
       </div>
 
-      {/* Pro Products Container - Grid Layout for All Screen Sizes */}
-      <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8">
-        {/* Grid Layout for All Screen Sizes */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-6 xl:gap-8 w-full">
+      {/* Pro Products Container - Horizontal Scroll for Small Screens, Grid for Large */}
+      <div className="relative z-10 w-full px-2 sm:px-4 lg:px-6 xl:px-8 max-w-full overflow-hidden">
+        {/* Desktop: Grid Layout (2 columns on large screens) */}
+        <div className="hidden lg:grid lg:grid-cols-2 gap-6 xl:gap-8 w-full">
           {proProducts.map((proProduct, index) => (
             <ProCard
               key={index}
@@ -148,6 +148,33 @@ const ChooseYourPro = ({ product }: ChooseYourProProps) => {
               onOrderNow={() => handleOrderNow(proProduct.product)}
             />
           ))}
+        </div>
+
+        {/* Mobile/Tablet: Horizontal Scroll Layout */}
+        <div className="lg:hidden max-w-full overflow-hidden">
+          <div className="flex gap-3 sm:gap-4 md:gap-6 overflow-x-auto pb-4 scrollbar-hide max-w-full">
+            {proProducts.map((proProduct, index) => (
+              <div 
+                key={index}
+                className="flex-shrink-0 w-72 sm:w-80 md:w-96 max-w-[90vw] sm:max-w-[80vw] md:max-w-[70vw]"
+              >
+                <ProCard
+                  name={proProduct.name}
+                  variant={proProduct.variant}
+                  image={proProduct.image}
+                  alt={proProduct.alt}
+                  batteryCapacity={proProduct.batteryCapacity}
+                  range={proProduct.range}
+                  topSpeed={proProduct.topSpeed}
+                  peakPower={proProduct.peakPower}
+                  acceleration={proProduct.acceleration}
+                  startingPrice={proProduct.startingPrice}
+                  product={proProduct.product}
+                  onOrderNow={() => handleOrderNow(proProduct.product)}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

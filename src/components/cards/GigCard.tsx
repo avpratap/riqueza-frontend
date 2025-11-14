@@ -62,6 +62,7 @@ const GigCard = ({
           src={image}
           alt={alt}
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover"
           priority
         />
@@ -106,6 +107,7 @@ const GigCard = ({
             </Link>
           ) : (
             <button
+              type="button"
               onClick={handleExplore}
               className="w-full bg-gray-900 text-white font-medium text-sm sm:text-base py-3 sm:py-4 px-4 sm:px-6 rounded-lg hover:bg-gray-800 transition-all duration-200 flex items-center justify-center gap-2"
             >
@@ -116,13 +118,17 @@ const GigCard = ({
           
           {product ? (
             <button 
+              type="button"
               onClick={handleBookNow}
               className="w-full text-gray-900 font-bold text-sm sm:text-base py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-gray-100 transition-all duration-200 flex items-center justify-center gap-2 border border-gray-200"
             >
               <span className="truncate">{secondaryButtonText}</span>
             </button>
           ) : (
-            <button className="w-full text-gray-900 font-bold text-sm sm:text-base py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-gray-100 transition-all duration-200 flex items-center justify-center gap-2 border border-gray-200">
+            <button 
+              type="button"
+              className="w-full text-gray-900 font-bold text-sm sm:text-base py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-gray-100 transition-all duration-200 flex items-center justify-center gap-2 border border-gray-200"
+            >
               <span className="truncate">{secondaryButtonText}</span>
             </button>
           )}

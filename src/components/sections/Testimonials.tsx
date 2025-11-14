@@ -104,10 +104,17 @@ const Testimonials = () => {
       if (window.innerWidth >= 768) return 2 // Tablet (2 reviews)
       return 1 // Mobile (1 review)
     }
-    return 3 // Default to 3 for SSR
+    return 4 // Default to 4 for SSR to match desktop
   }
 
-  const [itemsPerPage, setItemsPerPage] = useState(getItemsPerPage())
+  const [itemsPerPage, setItemsPerPage] = useState(4) // Start with 4 for SSR
+  const [mounted, setMounted] = useState(false)
+  
+  // Update on client side mount
+  useEffect(() => {
+    setMounted(true)
+    setItemsPerPage(getItemsPerPage())
+  }, [])
   const totalPages = Math.ceil(testimonials.length / itemsPerPage)
 
   // Update items per page on window resize
@@ -189,6 +196,8 @@ const Testimonials = () => {
                 onClick={prevPage}
                 className="flex absolute left-2 sm:left-4 md:left-6 lg:left-8 xl:left-12 top-1/2 transform -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white rounded-full shadow-lg items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 z-10"
                 aria-label="Previous testimonials"
+                type="button"
+                suppressHydrationWarning
               >
                 <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
               </button>
@@ -197,6 +206,8 @@ const Testimonials = () => {
                 onClick={nextPage}
                 className="flex absolute right-2 sm:right-4 md:right-6 lg:right-8 xl:right-12 top-1/2 transform -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white rounded-full shadow-lg items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 z-10"
                 aria-label="Next testimonials"
+                type="button"
+                suppressHydrationWarning
               >
                 <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
               </button>
@@ -283,6 +294,8 @@ const Testimonials = () => {
                     index === currentPage ? 'bg-blue-600 scale-125' : 'bg-gray-300 hover:bg-gray-400'
                   }`}
                   aria-label={`Go to page ${index + 1}`}
+                  type="button"
+                  suppressHydrationWarning
                 />
               ))}
             </div>
@@ -292,6 +305,8 @@ const Testimonials = () => {
               onClick={toggleAutoPlay}
               className="flex items-center space-x-2 px-3 py-1 bg-white rounded-full shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 text-sm text-gray-600 hover:text-blue-600"
               aria-label={isAutoPlaying ? 'Pause auto-play' : 'Resume auto-play'}
+              type="button"
+              suppressHydrationWarning
             >
               {isAutoPlaying ? (
                 <>

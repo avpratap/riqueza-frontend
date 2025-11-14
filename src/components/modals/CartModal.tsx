@@ -24,6 +24,7 @@ import {
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 import { cartApi } from '@/lib/cartApi'
+import { cartService } from '@/lib/cartService'
 import { convertBackendCartItems, CartItemWithDatabaseId } from '@/lib/cartItemConverter'
 
 const CartModal = () => {
@@ -44,13 +45,14 @@ const CartModal = () => {
     }
   }, [dispatch])
 
-  // Load cart from database when modal opens and Redux cart is empty
+  // Load cart from database when modal opens and Redux cart is empty (optimized - fast loading)
   useEffect(() => {
     if (isOpen && items.length === 0 && isAuthenticated && !hasLoadedFromDatabase) {
       console.log('🔄 Cart modal opened with empty Redux cart, loading from database...');
       
       const loadFromDatabase = async () => {
         try {
+          // Load immediately for fastest response
           const cartData = await cartApi.getCart();
           
           if (cartData.success && cartData.data && cartData.data.items && cartData.data.items.length > 0) {
@@ -62,13 +64,19 @@ const CartModal = () => {
               console.log('✅ Converted and loaded cart from database for modal:', validItems);
               dispatch(loadCart(validItems));
               setHasLoadedFromDatabase(true);
+            } else {
+              setHasLoadedFromDatabase(true); // Mark as loaded even if no valid items
             }
+          } else {
+            setHasLoadedFromDatabase(true); // Mark as loaded even if cart is empty
           }
         } catch (error) {
           console.error('Failed to load cart from database for modal:', error);
+          setHasLoadedFromDatabase(true); // Mark as loaded on error to prevent retry loops
         }
       };
 
+      // Load immediately without any delay for fastest response
       loadFromDatabase();
     }
   }, [isOpen, items.length, isAuthenticated, dispatch, hasLoadedFromDatabase])
@@ -111,13 +119,26 @@ const CartModal = () => {
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
+      // Store original values
+      const originalBodyOverflow = document.body.style.overflow
+      const originalBodyPaddingRight = document.body.style.paddingRight
+      const originalHtmlOverflow = document.documentElement.style.overflow
+      
+      // Calculate scrollbar width to prevent layout shift
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+      
+      // Hide scroll on both html and body
+      document.documentElement.style.overflow = 'hidden'
       document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-    
-    return () => {
-      document.body.style.overflow = 'unset'
+      document.body.style.paddingRight = `${scrollbarWidth}px`
+      document.body.classList.add('no-scroll')
+      
+      return () => {
+        document.documentElement.style.overflow = originalHtmlOverflow
+        document.body.style.overflow = originalBodyOverflow
+        document.body.style.paddingRight = originalBodyPaddingRight
+        document.body.classList.remove('no-scroll')
+      }
     }
   }, [isOpen])
 
@@ -146,14 +167,28 @@ const CartModal = () => {
     }
   }, [isOpen, dispatch])
 
-  const handleQuantityChange = (itemId: string, newQuantity: number) => {
+  const handleQuantityChange = async (itemId: string, newQuantity: number) => {
+    // Find the item to get its database ID
+    const item = items.find(item => item.id === itemId);
+    
+    if (!item) {
+      console.error('❌ Item not found in cart:', itemId);
+      return;
+    }
+    
+    const databaseId = (item as any)?.databaseId;
+    
     if (newQuantity <= 0) {
-      dispatch(removeFromCart(itemId))
+      // Use databaseId if available, otherwise use itemId (for guest users)
+      const idToUse = databaseId || itemId;
+      console.log('🗑️ Removing item:', { itemId, databaseId, idToUse });
+      dispatch(removeFromCart(idToUse));
     } else {
-      // Find the item to get its database ID
-      const item = items.find(item => item.id === itemId);
-      const databaseId = (item as any)?.databaseId;
-      dispatch(updateQuantity({ itemId, quantity: newQuantity, databaseId }))
+      // Update quantity - use databaseId if available, otherwise itemId
+      // For guest users, itemId might be the database UUID, or we might not have databaseId
+      const idToUse = databaseId || itemId;
+      console.log('🔄 Updating quantity:', { itemId, newQuantity, databaseId, idToUse });
+      dispatch(updateQuantity({ itemId, quantity: newQuantity, databaseId: idToUse }))
     }
   }
 
@@ -175,68 +210,46 @@ const CartModal = () => {
       }
       
       const databaseId = (item as any)?.databaseId;
+      // For guest users, use databaseId if available, otherwise use itemId
+      const idToUse = databaseId || itemId;
       
       console.log('🔍 Item found:', {
         frontendId: itemId,
         databaseId,
+        idToUse,
         hasDatabaseId: !!databaseId,
         itemStructure: Object.keys(item)
       });
       
-      if (databaseId) {
-        console.log('🗑️ Removing item with database ID:', databaseId);
-        console.log('📦 Item details:', { 
-          frontendId: itemId, 
-          databaseId, 
-          productName: item?.product?.name,
-          variant: item?.variant?.name 
-        });
-        
-        // Dispatch to Redux (this will also trigger backend sync)
-        dispatch(removeFromCart(databaseId));
-        
-        // Show success feedback
-        console.log('✅ Item removal initiated successfully');
-        
-        // Force refresh cart from backend after a short delay to ensure sync
-        setTimeout(async () => {
-          try {
-            console.log('🔄 Refreshing cart from backend after delete...');
-            const cartData = await cartApi.getCart();
-            if (cartData.success && cartData.data && cartData.data.items) {
-              const validItems = await convertBackendCartItems(cartData.data.items);
-              dispatch(loadCart(validItems));
-              console.log('✅ Cart refreshed from backend:', validItems.length, 'items');
-            }
-          } catch (error) {
-            console.error('❌ Failed to refresh cart from backend:', error);
-          }
-        }, 1000);
-      } else {
-        console.error('❌ No database ID found for item:', itemId);
-        console.log('📦 Item details:', { 
-          frontendId: itemId, 
-          productName: item?.product?.name,
-          variant: item?.variant?.name 
-        });
-        console.log('🔄 Attempting to reload cart from backend to get database IDs...');
-        
-        // Try to reload cart from backend to get proper database IDs
+      console.log('🗑️ Removing item:', {
+        frontendId: itemId, 
+        databaseId, 
+        idToUse,
+        productName: item?.product?.name,
+        variant: item?.variant?.name 
+      });
+      
+      // Dispatch to Redux (this will also trigger backend sync)
+      // Use databaseId if available, otherwise use itemId
+      dispatch(removeFromCart(idToUse));
+      
+      // Show success feedback
+      console.log('✅ Item removal initiated successfully');
+      
+      // Force refresh cart from backend after a short delay to ensure sync
+      setTimeout(async () => {
         try {
+          console.log('🔄 Refreshing cart from backend after delete...');
           const cartData = await cartApi.getCart();
           if (cartData.success && cartData.data && cartData.data.items) {
             const validItems = await convertBackendCartItems(cartData.data.items);
             dispatch(loadCart(validItems));
-            console.log('✅ Reloaded cart from backend, try deleting again');
-            return;
+            console.log('✅ Cart refreshed from backend:', validItems.length, 'items');
           }
         } catch (error) {
-          console.error('❌ Failed to reload cart from backend:', error);
+          console.error('❌ Failed to refresh cart from backend:', error);
         }
-        
-        console.log('❌ Cannot delete item without database ID');
-        return;
-      }
+      }, 1000);
     } catch (error) {
       console.error('❌ Error removing item from cart:', error);
     }
@@ -381,14 +394,24 @@ const CartModal = () => {
                     <div className="flex gap-2 sm:gap-4 pr-6 sm:pr-8">
                       {/* Product Image */}
                       <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                        <img
-                          src={item.product.images?.[0]?.image_url || '/images/placeholder.png'}
-                          alt={item.product.name}
-                          className="w-full h-full object-cover"
-                          style={{ 
-                            filter: item.color?.css_filter || 'none' 
-                          }}
-                        />
+                        {item.product?.images && item.product.images.length > 0 ? (
+                          <img
+                            src={item.product.images[0].image_url}
+                            alt={item.product.name}
+                            className="w-full h-full object-cover"
+                            style={{ 
+                              filter: item.color?.css_filter || 'none' 
+                            }}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://res.cloudinary.com/dnulm62j6/image/upload/v1758562609/m1_o5y1jo.webp';
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
+                            <ShoppingBag className="w-8 h-8 text-blue-400" />
+                          </div>
+                        )}
                       </div>
                       
                       {/* Product Details */}
@@ -581,8 +604,26 @@ const CartModal = () => {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                              className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+                              onClick={() => {
+                                const databaseId = (item as any)?.databaseId;
+                                const idToUse = databaseId || item.id;
+                                
+                                if (item.quantity <= 1) {
+                                  // Remove item if quantity would be 0 or less
+                                  // Use databaseId if available, otherwise use itemId
+                                  console.log('🗑️ Removing item via minus button:', { 
+                                    itemId: item.id, 
+                                    databaseId, 
+                                    idToUse,
+                                    quantity: item.quantity 
+                                  });
+                                  handleRemoveItem(item.id);
+                                } else {
+                                  // Decrement quantity
+                                  handleQuantityChange(item.id, item.quantity - 1);
+                                }
+                              }}
+                              className="w-7 h-7 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
                             >
                               <Minus className="w-4 h-4" />
                             </button>
@@ -590,8 +631,10 @@ const CartModal = () => {
                               {item.quantity}
                             </span>
                             <button
-                              onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                              className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+                              onClick={() => {
+                                handleQuantityChange(item.id, item.quantity + 1);
+                              }}
+                              className="w-7 h-7 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
                             >
                               <Plus className="w-4 h-4" />
                             </button>
@@ -627,15 +670,39 @@ const CartModal = () => {
               {/* Action Buttons */}
               <div className="space-y-3">
                 <button
-                  onClick={() => {
-                    if (isAuthenticated) {
-                      dispatch(closeCart());
-                      window.location.href = '/checkout';
-                    } else {
-                      // Open mobile login form
-                      dispatch(setAuthModalMode('login'));
-                      dispatch(setAuthModalOpen(true));
-                      dispatch(closeCart());
+                  onClick={async () => {
+                    try {
+                      console.log('🔄 Syncing cart to backend before navigation...');
+                      
+                      // Sync entire cart state to backend before navigation
+                      await cartService.syncEntireCartToBackend(items);
+                      
+                      console.log('✅ Cart synced successfully, proceeding...');
+                      
+                      // Small delay to ensure backend has processed the updates
+                      await new Promise(resolve => setTimeout(resolve, 300));
+                      
+                      if (isAuthenticated) {
+                        dispatch(closeCart());
+                        window.location.href = '/checkout';
+                      } else {
+                        // Open mobile login form
+                        dispatch(setAuthModalMode('login'));
+                        dispatch(setAuthModalOpen(true));
+                        dispatch(closeCart());
+                      }
+                    } catch (error) {
+                      console.error('❌ Failed to sync cart before navigation:', error);
+                      // Still proceed with navigation even if sync fails
+                      // The checkout page will load cart from backend
+                      if (isAuthenticated) {
+                        dispatch(closeCart());
+                        window.location.href = '/checkout';
+                      } else {
+                        dispatch(setAuthModalMode('login'));
+                        dispatch(setAuthModalOpen(true));
+                        dispatch(closeCart());
+                      }
                     }
                   }}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-3 text-lg"

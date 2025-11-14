@@ -84,6 +84,7 @@ const ProductHero = ({ product }: ProductHeroProps) => {
           {/* CTA Buttons - Smaller Size, Responsive */}
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-24">
             <button 
+              type="button"
               onClick={() => setIsVideoModalOpen(true)}
               className="w-full sm:w-auto min-w-[160px] sm:min-w-[180px] text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 inline-flex items-center justify-center space-x-2 group bg-transparent border-2 border-white text-white hover:bg-white hover:text-gray-900 transition-all duration-300 font-medium rounded-lg"
             >
@@ -91,6 +92,7 @@ const ProductHero = ({ product }: ProductHeroProps) => {
               <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform duration-200" />
             </button>
             <button 
+              type="button"
               onClick={handleBuyNow}
               className="w-full sm:w-auto min-w-[160px] sm:min-w-[180px] text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 inline-flex items-center justify-center space-x-2 group bg-transparent border-2 border-white text-white hover:bg-white hover:text-gray-900 transition-all duration-300 font-medium rounded-lg"
             >

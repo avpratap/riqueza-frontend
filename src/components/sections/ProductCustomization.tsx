@@ -93,6 +93,7 @@ const ProductCustomization = () => {
                   {colors.map((color) => (
                     <button
                       key={color.id}
+                      type="button"
                       onClick={() => handleColorChange(color.id)}
                       className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full border-2 transition-all duration-200 hover:scale-105 ${
                         selectedColor === color.id
@@ -108,6 +109,7 @@ const ProductCustomization = () => {
               {/* 360° View Button */}
               <div>
                 <button 
+                  type="button"
                   onClick={handle360ViewToggle}
                   className={`w-full sm:w-auto px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 rounded-xl font-semibold text-base sm:text-lg lg:text-xl hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center justify-center gap-3 ${
                     is360View 

@@ -11,13 +11,20 @@ import { openBuyNowModal } from '@/store/slices/uiSlice'
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [mounted, setMounted] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
   const { products } = useSelector((state: RootState) => state.products)
 
-  // Get products from Redux state
-  const requezaS1ProPlus = products.find(p => p.slug === 'riqueza-s1-pro-plus')
-  const requezaS1Pro = products.find(p => p.slug === 'riqueza-s1-pro')
+  // Track if component is mounted to prevent hydration mismatches
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
+  // Get products from Redux state (only after mount to prevent hydration issues)
+  const requezaS1ProPlus = mounted ? products.find(p => p.slug === 'riqueza-s1-pro-plus') : null
+  const requezaS1Pro = mounted ? products.find(p => p.slug === 'riqueza-s1-pro') : null
+
+  // Create heroSlides array consistently - always include product info but conditionally use it
   const heroSlides = [
     {
       id: 1,
@@ -28,7 +35,7 @@ const Hero = () => {
       ctaSecondary: "Book Now",
       image: "https://res.cloudinary.com/dnulm62j6/image/upload/v1758558786/s1_pro_plus_banner_web_v2_ttur01.webp",
       color: "red",
-      product: requezaS1ProPlus,
+      product: null, // Always null on server, updated after mount
       slug: "riqueza-s1-pro-plus"
     },
     {
@@ -40,7 +47,7 @@ const Hero = () => {
       ctaSecondary: "Book Now",
       image: "https://res.cloudinary.com/dnulm62j6/image/upload/v1758558786/s1_x_gen3_plus_banner_web_image_iuok1i.webp",
       color: "blue",
-      product: requezaS1Pro,
+      product: null, // Always null on server, updated after mount
       slug: "riqueza-s1-pro"
     },
     // {
@@ -81,14 +88,14 @@ const Hero = () => {
     // }
   ]
 
-  // Auto-scroll functionality
+  // Auto-scroll functionality - use consistent length
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
     }, 5000)
 
     return () => clearInterval(timer)
-  }, [heroSlides.length])
+  }, [])
 
   // Manual navigation
   const goToSlide = (index: number) => {
@@ -118,7 +125,25 @@ const Hero = () => {
     }
   }
 
-  const currentHero = heroSlides[currentSlide]
+  // Update hero slides with products after mount to ensure consistent rendering
+  const [heroSlidesWithProducts, setHeroSlidesWithProducts] = useState(heroSlides)
+  
+  useEffect(() => {
+    if (mounted) {
+      setHeroSlidesWithProducts([
+        {
+          ...heroSlides[0],
+          product: requezaS1ProPlus
+        },
+        {
+          ...heroSlides[1],
+          product: requezaS1Pro
+        }
+      ])
+    }
+  }, [mounted, requezaS1ProPlus, requezaS1Pro])
+
+  const currentHero = heroSlidesWithProducts[currentSlide]
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 pt-16 max-w-full">
@@ -135,15 +160,19 @@ const Hero = () => {
 
       {/* Navigation Arrows - Responsive */}
       <button
+        type="button"
         onClick={goToPrevious}
         className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-all duration-200 group"
+        suppressHydrationWarning
       >
         <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white group-hover:scale-110 transition-transform duration-200" />
       </button>
 
       <button
+        type="button"
         onClick={goToNext}
         className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-all duration-200 group"
+        suppressHydrationWarning
       >
         <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white group-hover:scale-110 transition-transform duration-200" />
       </button>
@@ -189,8 +218,10 @@ const Hero = () => {
               </Link>
             )}
             
-            {currentHero.product ? (
+            {/* Always render Link on server, button only after mount if product exists */}
+            {mounted && currentHero.product ? (
               <button
+                type="button"
                 onClick={() => handleBookNow(currentHero)}
                 className="w-full sm:w-auto min-w-[200px] sm:min-w-[220px] text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 inline-flex items-center justify-center space-x-2 group bg-transparent border-2 border-white text-white hover:bg-white hover:text-gray-900 transition-all duration-300 font-medium rounded-lg"
               >
@@ -213,15 +244,17 @@ const Hero = () => {
       {/* Pagination Dots - Responsive */}
       <div className="absolute bottom-4 sm:bottom-6 lg:bottom-8 left-1/2 transform -translate-x-1/2 z-20">
         <div className="flex space-x-2 sm:space-x-3">
-          {heroSlides.map((_, index) => (
+          {heroSlidesWithProducts.map((_, index) => (
             <button
               key={index}
+              type="button"
               onClick={() => goToSlide(index)}
               className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
                 index === currentSlide 
                   ? 'bg-white scale-125' 
                   : 'bg-white/50 hover:bg-white/75'
               }`}
+              suppressHydrationWarning
             />
           ))}
         </div>

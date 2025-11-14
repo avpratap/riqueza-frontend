@@ -229,12 +229,25 @@ export const cartApi = {
       guestSessionId: guestSessionId.substring(0, 20) + '...'
     });
 
-    return apiRequest('/cart-transfer/transfer', {
-      method: 'POST',
-      headers: {
-        'X-Guest-Session-Id': guestSessionId
+    try {
+      return await apiRequest('/cart-transfer/transfer', {
+        method: 'POST',
+        headers: {
+          'X-Guest-Session-Id': guestSessionId
+        }
+      });
+    } catch (error: any) {
+      // If it's a 404 or "not found" error, return a success response instead
+      if (error.status === 404 || error.message?.includes('not found')) {
+        console.log('ℹ️ Guest cart transfer endpoint returned 404 (likely no items to transfer)');
+        return {
+          success: true,
+          message: 'No guest cart items to transfer',
+          data: { itemsTransferred: 0 }
+        };
       }
-    });
+      throw error;
+    }
   },
 };
 

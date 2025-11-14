@@ -1,15 +1,15 @@
 import { CartItem } from '@/store/slices/cartSlice';
 
 export interface CartItemWithDatabaseId extends CartItem {
-  databaseId?: number;
+  databaseId?: string; // UUID as string
 }
 
 export interface BackendCartItem {
-  id: number;
-  user_id: string;
-  product_id: string;
-  variant_id: string;
-  color_id: string;
+  id: string; // UUID
+  user_id: string; // UUID
+  product_id: string; // UUID
+  variant_id: string; // UUID
+  color_id: string; // UUID
   quantity: number;
   accessories: any[];
   total_price: string;
@@ -58,7 +58,7 @@ export const convertBackendCartItemToFrontend = async (backendItem: BackendCartI
     
     const convertedItem = {
       id: `${backendItem.product_id}-${backendItem.variant_id}-${backendItem.color_id}`,
-      databaseId: Number(backendItem.id), // Store the database ID for backend operations (ensure it's a number)
+      databaseId: backendItem.id, // Store the UUID database ID as string for backend operations
       product: {
         id: backendItem.product_id,
         name: backendItem.product_name || `Product ${backendItem.product_id}`,
@@ -78,7 +78,7 @@ export const convertBackendCartItemToFrontend = async (backendItem: BackendCartI
           : [
               {
                 id: 'img_1',
-                image_url: '/images/placeholder.png',
+                image_url: 'https://res.cloudinary.com/dnulm62j6/image/upload/v1758562609/m1_o5y1jo.webp',
                 alt_text: 'Product image',
                 display_order: 0,
                 is_primary: true

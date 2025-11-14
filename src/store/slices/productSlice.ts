@@ -247,14 +247,17 @@ const productSlice = createSlice({
       .addCase(fetchProductBySlug.pending, (state) => {
         state.isLoading = true
         state.error = null
+        state.selectedProduct = null // Clear previous product when fetching new one
       })
       .addCase(fetchProductBySlug.fulfilled, (state, action) => {
         state.isLoading = false
+        state.error = null // Clear any previous errors
         state.selectedProduct = action.payload
       })
       .addCase(fetchProductBySlug.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload as string
+        state.selectedProduct = null // Clear product on error
       })
       .addCase(fetchAccessories.pending, (state) => {
         state.isLoading = true

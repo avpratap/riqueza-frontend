@@ -27,11 +27,12 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [hasLoadedCart, setHasLoadedCart] = useState(false)
 
-  // Load cart from backend on mount
+  // Load cart from backend on mount (optimized - immediate loading for badge visibility)
   useEffect(() => {
+    if (hasLoadedCart) return
+    
+    // Load cart immediately - no delays for instant badge visibility
     const loadCartFromBackend = async () => {
-      if (hasLoadedCart) return
-      
       try {
         console.log('🔄 Loading cart from backend on page load...')
         const cartData = await cartApi.getCart()
@@ -54,12 +55,8 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
       }
     }
     
-    // Load cart after a delay to ensure backend is ready
-    const timer = setTimeout(() => {
-      loadCartFromBackend()
-    }, 2000)
-    
-    return () => clearTimeout(timer)
+    // Load immediately without any wrapper for fastest response
+    loadCartFromBackend()
   }, [dispatch, hasLoadedCart])
 
   useEffect(() => {
@@ -77,7 +74,20 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
   // Prevent body scroll and add blur effect when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
+      // Store original values
+      const originalBodyOverflow = document.body.style.overflow
+      const originalBodyPaddingRight = document.body.style.paddingRight
+      const originalHtmlOverflow = document.documentElement.style.overflow
+      
+      // Calculate scrollbar width to prevent layout shift
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+      
+      // Hide scroll on both html and body
+      document.documentElement.style.overflow = 'hidden'
       document.body.style.overflow = 'hidden'
+      document.body.style.paddingRight = `${scrollbarWidth}px`
+      document.body.classList.add('no-scroll')
+      
       // Add blur to main content areas
       const contentSelectors = [
         'main',
@@ -96,30 +106,40 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
           }
         })
       })
-    } else {
-      document.body.style.overflow = 'unset'
-      // Remove blur from all content areas
-      const contentSelectors = [
-        'main',
-        '[data-hero]',
-        '.hero-section',
-        '.content-area',
-        '#__next > div:not(header)'
-      ]
       
-      contentSelectors.forEach(selector => {
-        const elements = document.querySelectorAll(selector)
-        elements.forEach(element => {
-          if (element instanceof HTMLElement) {
-            element.style.filter = 'none'
-          }
+      // Cleanup on unmount or when menu closes
+      return () => {
+        document.documentElement.style.overflow = originalHtmlOverflow
+        document.body.style.overflow = originalBodyOverflow
+        document.body.style.paddingRight = originalBodyPaddingRight
+        document.body.classList.remove('no-scroll')
+        
+        // Remove blur from all content areas
+        const contentSelectors = [
+          'main',
+          '[data-hero]',
+          '.hero-section',
+          '.content-area',
+          '#__next > div:not(header)'
+        ]
+        
+        contentSelectors.forEach(selector => {
+          const elements = document.querySelectorAll(selector)
+          elements.forEach(element => {
+            if (element instanceof HTMLElement) {
+              element.style.filter = 'none'
+            }
+          })
         })
-      })
-    }
-    
-    // Cleanup on unmount
-    return () => {
-      document.body.style.overflow = 'unset'
+      }
+    } else {
+      // Ensure scroll is enabled when menu is closed
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
+      document.body.style.paddingRight = ''
+      document.body.classList.remove('no-scroll')
+      
+      // Remove blur from all content areas
       const contentSelectors = [
         'main',
         '[data-hero]',
@@ -165,8 +185,8 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
   }, [isMobileMenuOpen, dispatch])
 
   const scooterModels = [
-    { name: 'Riqueza S1 Pro+', href: '/product/requeza-s1-pro-plus' },
-    { name: 'Riqueza S1 Pro', href: '/product/requeza-s1-pro' },
+    { name: 'Riqueza S1 Pro+', href: '/product/riqueza-s1-pro-plus' },
+    { name: 'Riqueza S1 Pro', href: '/product/riqueza-s1-pro' },
   ]
 
   const navigation = [
@@ -245,16 +265,20 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
 
             {/* Cart */}
             <button
+              type="button"
               onClick={() => dispatch(toggleCart())}
               className="relative p-2 sm:p-3 text-gray-600 hover:text-blue-600 transition-all duration-200 hover:bg-blue-50 rounded-full group"
               data-cart-button
+              suppressHydrationWarning
             >
-              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform duration-200" />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center font-bold shadow-lg animate-pulse">
-                  {totalItems}
-                </span>
-              )}
+              <div className="relative">
+                <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform duration-200" />
+                {totalItems > 0 && (
+                  <span className="absolute top-0 right-0 bg-gray-900 text-white text-xs rounded-full min-w-[1.25rem] sm:min-w-[1.5rem] h-5 sm:h-6 px-1 sm:px-1.5 flex items-center justify-center font-bold shadow-lg transform translate-x-[70%] -translate-y-[70%] z-10">
+                    {totalItems}
+                  </span>
+                )}
+              </div>
             </button>
 
             {/* User Menu - Only visible on desktop (xl+), hidden on small screens */}
@@ -273,8 +297,10 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
                       Hi, {user?.name?.split(' ')[0] || user?.name}
                     </span>
                     <button 
+                      type="button"
                       onClick={() => dispatch(logout())}
                       className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200 text-xs sm:text-sm"
+                      suppressHydrationWarning
                     >
                       Logout
                     </button>
@@ -282,20 +308,24 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
                 ) : (
                   <div className="flex items-center space-x-2 lg:space-x-3">
                     <button
+                      type="button"
                       onClick={() => {
                         dispatch(setAuthModalMode('login'))
                         dispatch(setAuthModalOpen(true))
                       }}
                       className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-1.5 sm:px-6 sm:py-2 rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200 text-xs sm:text-sm"
+                      suppressHydrationWarning
                     >
                       Login
                     </button>
                     <button
+                      type="button"
                       onClick={() => {
                         dispatch(setAuthModalMode('signup'))
                         dispatch(setAuthModalOpen(true))
                       }}
                       className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-1.5 sm:px-6 sm:py-2 rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200 text-xs sm:text-sm"
+                      suppressHydrationWarning
                     >
                       Sign Up
                     </button>
@@ -306,9 +336,11 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
 
             {/* Mobile Menu Button - Always shows hamburger icon */}
             <button
+              type="button"
               onClick={() => dispatch(toggleMobileMenu())}
               className="xl:hidden p-2 sm:p-3 text-gray-600 hover:text-blue-600 transition-all duration-200 hover:bg-blue-50 rounded-full group"
               data-menu-button
+              suppressHydrationWarning
             >
               <Menu className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform duration-200" />
             </button>
@@ -364,8 +396,10 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
                  
                  {/* Close Button */}
                  <button
+                   type="button"
                    onClick={() => dispatch(closeMobileMenu())}
                    className="p-2 text-gray-600 hover:text-red-600 transition-colors duration-200 hover:bg-red-50 rounded-full"
+                   suppressHydrationWarning
                  >
                    <X className="w-5 h-5" />
                  </button>
@@ -447,6 +481,7 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
                   {isAuthenticated ? (
                     <div className="space-y-3">
                       <motion.button
+                        type="button"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
@@ -454,6 +489,7 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
                           dispatch(closeMobileMenu())
                         }}
                         className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold text-center hover:shadow-lg transition-all duration-200"
+                        suppressHydrationWarning
                       >
                         Logout
                       </motion.button>
@@ -462,24 +498,28 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
                     <div className="space-y-3">
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                         <button
+                          type="button"
                           onClick={() => {
                             dispatch(setAuthModalMode('login'))
                             dispatch(setAuthModalOpen(true))
                             dispatch(closeMobileMenu())
                           }}
                           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold text-center hover:shadow-lg transition-all duration-200"
+                          suppressHydrationWarning
                         >
                           Login
                         </button>
                       </motion.div>
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                         <button
+                          type="button"
                           onClick={() => {
                             dispatch(setAuthModalMode('signup'))
                             dispatch(setAuthModalOpen(true))
                             dispatch(closeMobileMenu())
                           }}
                           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold text-center hover:shadow-lg transition-all duration-200"
+                          suppressHydrationWarning
                         >
                           Sign Up
                         </button>

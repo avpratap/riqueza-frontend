@@ -14,8 +14,8 @@ const ProductTabsSection = () => {
   }
 
   return (
-    <section className="w-full bg-white py-20">
-      <div className="w-full px-8 lg:px-16">
+    <section className="w-full bg-white py-8 sm:py-12 lg:py-16 xl:py-20">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 max-w-full overflow-hidden">
         {/* Shared Tab Navigation */}
         <SharedTabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
 

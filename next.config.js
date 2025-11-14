@@ -1,7 +1,28 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['localhost', 'cdn.olaelectric.com', 'res.cloudinary.com', 'assets.olaelectric.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.olaelectric.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'assets.olaelectric.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'dyu8p57rmh62v.cloudfront.net',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+    ],
     formats: ['image/webp', 'image/avif'],
   },
   env: {
