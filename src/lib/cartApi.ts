@@ -86,14 +86,22 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
     hasGuestSessionId: !!guestSessionId
   });
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-  
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+    
+    return response.json();
+  } catch (error: any) {
+    // Enhance error messages for connection issues
+    if (error.message?.includes('Failed to fetch') || error.message?.includes('Connection refused')) {
+      throw new Error('Unable to connect to server. Please check if the backend server is running.');
+    }
+    throw error;
   }
-  
-  return response.json();
 };
 
 // Cart API functions

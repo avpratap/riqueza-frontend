@@ -9,6 +9,7 @@ import { X } from 'lucide-react'
 import MobileLoginForm from './MobileLoginForm'
 import OTPVerification from './OTPVerification'
 import AuthTermsModal from '@/components/modals/AuthTermsModal'
+import { useModalHistory } from '@/hooks/useModalHistory'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -24,6 +25,13 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalProps) =
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false)
   const { isAuthenticated } = useSelector((state: RootState) => state.auth)
   const { authModalMode } = useSelector((state: RootState) => state.ui)
+  
+  // Handle browser back button
+  useModalHistory({
+    isOpen,
+    onClose,
+    modalId: 'auth-modal'
+  })
   
   // Use the mode from Redux state
   const mode = authModalMode
@@ -105,36 +113,35 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalProps) =
         
         {/* Modal with smooth slide-down animation from top to center */}
         <div 
-          className="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all duration-500 ease-out w-full max-w-md mx-auto animate-slide-down z-[99999]"
+          className="relative transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all duration-500 ease-out w-full max-w-md mx-auto animate-slide-down z-[99999] p-8"
           style={{ zIndex: 99999 }}
         >
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-10 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+            className="absolute top-4 right-4 z-10 w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors"
+            type="button"
           >
             <X className="w-5 h-5" />
           </button>
 
           {/* Content */}
-          <div className="p-6">
-            {currentStep === 'phone' ? (
-              <MobileLoginForm 
-                mode={mode}
-                onOTPSent={handleOTPSent}
-                onModeChange={handleModeChange}
-                onOpenTerms={() => setIsTermsModalOpen(true)}
-                onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
-              />
-            ) : (
-              <OTPVerification 
-                phoneNumber={phoneNumber}
-                mode={mode}
-                onBack={handleBack}
-                onSuccess={handleOTPSuccess}
-              />
-            )}
-          </div>
+          {currentStep === 'phone' ? (
+            <MobileLoginForm 
+              mode={mode}
+              onOTPSent={handleOTPSent}
+              onModeChange={handleModeChange}
+              onOpenTerms={() => setIsTermsModalOpen(true)}
+              onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
+            />
+          ) : (
+            <OTPVerification 
+              phoneNumber={phoneNumber}
+              mode={mode}
+              onBack={handleBack}
+              onSuccess={handleOTPSuccess}
+            />
+          )}
         </div>
       </div>
 

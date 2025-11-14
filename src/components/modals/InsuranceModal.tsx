@@ -5,12 +5,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import { ChevronUp, Info, ShoppingCart, CreditCard } from 'lucide-react'
 import { RootState, AppDispatch } from '@/store/store'
 import { addToCart } from '@/store/slices/cartSlice'
-import { closeBuyNowModal } from '@/store/slices/uiSlice'
+import { closeBuyNowModal, setAuthModalOpen, setAuthModalMode } from '@/store/slices/uiSlice'
 import Link from 'next/link'
 import InfoModal from './InfoModal'
 import SoftWarningModal from './SoftWarningModal'
 import PdfModal from './PdfModal'
 import DamagePlanCard from '../cards/DamagePlanCard'
+import { useModalHistory } from '@/hooks/useModalHistory'
 
 interface InsuranceModalProps {
   isOpen: boolean
@@ -81,6 +82,15 @@ const getAutoSelectedAddOns = (providerId: string) => {
 const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selectedColor, selectedAccessories = [] }: InsuranceModalProps) => {
   const dispatch = useDispatch<AppDispatch>()
   const { selectedProduct } = useSelector((state: RootState) => state.products)
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth)
+  
+  // Handle browser back button (disabled for nested modal within BuyNowModal flow)
+  useModalHistory({
+    isOpen,
+    onClose,
+    modalId: 'insurance-modal',
+    disabled: false // Enable back button handling
+  })
   
   const [selectedProvider, setSelectedProvider] = useState('reliance')
   const [showAddOns, setShowAddOns] = useState(true)
@@ -386,9 +396,9 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
       style={{ height: '100vh', margin: 0, padding: 0 }}
       onClick={handleBackdropClick}
     >
-      {/* Mobile: Full screen overlay */}
-      <div className="lg:hidden absolute inset-0 bg-white">
-        <div className="w-full h-full flex flex-col bg-white" style={{ backgroundColor: '#ffffff' }}>
+        {/* Mobile: Full screen overlay */}
+        <div className="lg:hidden fixed inset-0 bg-white z-[60]" style={{ height: '100vh', overflow: 'hidden' }}>
+          <div className="w-full h-full flex flex-col bg-white" style={{ backgroundColor: '#ffffff' }}>
           {/* Back Button */}
           <div className="absolute top-4 left-4 z-10">
             <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full flex items-center justify-center">
@@ -411,15 +421,15 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
           </div>
 
           {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 mt-16 pb-6">
+          <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 py-3 sm:py-4 mt-14 sm:mt-16 pb-20 sm:pb-6">
             {/* Header */}
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               {/* Title and Price in same line */}
-              <div className="flex items-start justify-between mb-3">
-                <div className="text-lg font-bold text-gray-900 leading-tight flex-1 pr-4">
+              <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
+                <div className="text-base sm:text-lg font-bold text-gray-900 leading-tight flex-1 pr-2 sm:pr-4">
                   Insurance included in on-road price
                 </div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 flex-shrink-0">
                   ₹{calculateTotal().toLocaleString('en-IN')}
                 </div>
               </div>
@@ -565,22 +575,22 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
               </div>
 
               {showAddOns && (
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {addOnsData.map((addon) => {
                     const isSelected = selectedAddOns[addon.id as keyof typeof selectedAddOns] || false;
                     return (
                       <div
                         key={addon.id}
-                        className="bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4 cursor-pointer hover:bg-gray-100 transition-colors"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
                           handleAddOnToggle(addon.id);
                         }}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3 flex-1">
-                            <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                            <div className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center flex-shrink-0 mt-0.5">
                               {isSelected ? (
                                 <div className="w-6 h-6 rounded bg-green-500 flex items-center justify-center">
                                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -591,12 +601,12 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
                                 <div className="w-6 h-6 border-2 border-gray-300 rounded flex-shrink-0 bg-white"></div>
                               )}
                             </div>
-                            <div className="flex-1">
-                              <div className="font-medium text-gray-900">{addon.title}</div>
-                              <div className="text-sm text-gray-600">{addon.description}</div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm sm:text-base font-medium text-gray-900 leading-tight mb-0.5">{addon.title}</div>
+                              <div className="text-xs sm:text-sm text-gray-600 leading-relaxed">{addon.description}</div>
                             </div>
                           </div>
-                          <div className="font-semibold text-gray-900 ml-3">
+                          <div className="text-sm sm:text-base font-semibold text-gray-900 ml-2 flex-shrink-0">
                             ₹{addon.price}
                           </div>
                         </div>
@@ -611,48 +621,48 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
             <div className="w-full h-px bg-gray-200 mb-4"></div>
 
             {/* Additional Cover Section */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="text-lg font-semibold text-gray-900">Additional Cover</div>
-                <div className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
+            <div className="mb-4 sm:mb-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+                <div className="text-base sm:text-lg font-semibold text-gray-900">Additional Cover</div>
+                <div className="bg-green-100 text-green-800 text-[10px] sm:text-xs px-2 py-0.5 sm:py-1 rounded-full font-medium flex-shrink-0">
                   RECOMMENDED
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-2 sm:space-y-3">
                 {additionalCoverData.map((cover) => {
                   const isSelected = selectedAddOns[cover.id as keyof typeof selectedAddOns] || false;
                   return (
                     <div
                       key={cover.id}
-                      className="bg-gray-50 border border-gray-200 rounded-lg p-3 cursor-pointer hover:bg-gray-100 transition-colors"
+                      className="bg-gray-50 border border-gray-200 rounded-lg p-2.5 sm:p-3 cursor-pointer hover:bg-gray-100 transition-colors"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         toggleAddOn(cover.id);
                       }}
                     >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3 flex-1">
-                          <div className="w-6 h-6 flex items-center justify-center mt-1 flex-shrink-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                          <div className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center mt-0.5 flex-shrink-0">
                             {isSelected ? (
-                              <div className="w-6 h-6 rounded bg-green-500 flex items-center justify-center">
-                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-green-500 flex items-center justify-center">
+                                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                 </svg>
                               </div>
                             ) : (
-                              <div className="w-6 h-6 border-2 border-gray-300 rounded flex-shrink-0 bg-white"></div>
+                              <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-gray-300 rounded flex-shrink-0 bg-white"></div>
                             )}
                           </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900 mb-1">{cover.title}</div>
-                            <div className="text-sm text-gray-600">
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm sm:text-base font-medium text-gray-900 mb-0.5 sm:mb-1 leading-tight">{cover.title}</div>
+                            <div className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                               {cover.description}
                             </div>
                           </div>
                         </div>
-                        <div className="font-bold text-gray-900 ml-3">
+                        <div className="text-sm sm:text-base font-bold text-gray-900 ml-2 flex-shrink-0">
                           ₹{cover.price}
                         </div>
                       </div>
@@ -663,11 +673,11 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
             </div>
 
             {/* Terms and Conditions */}
-            <div className="mb-6 space-y-3">
-              <div className="text-xs text-gray-500">
+            <div className="mb-4 sm:mb-6 space-y-2 sm:space-y-3">
+              <div className="text-[10px] sm:text-xs text-gray-500 leading-relaxed">
                 Add-ons and additional cover are pre-selected for convenience, opt out anytime.
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                 By continuing, I agree to the{' '}
                 <span 
                   className="text-blue-600 underline cursor-pointer hover:text-blue-800"
@@ -689,7 +699,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
             </div>
 
             {/* Footer */}
-            <div className="text-xs text-gray-400 space-y-1">
+            <div className="text-[10px] sm:text-xs text-gray-400 space-y-0.5 sm:space-y-1 leading-relaxed">
               <div>Powered by Ola Financial Services Pvt. Ltd</div>
               <div>IRDAI Registration No. CA0682, CIN: U22219KA2007PTC127705</div>
               <div>Office : Ola Campus, Prestige RMZ Startech, Koramangala, Bangalore-560095</div>
@@ -697,12 +707,12 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
           </div>
 
           {/* Fixed Bottom Section */}
-          <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-4 space-y-3">
+          <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-3 sm:p-4 space-y-2 sm:space-y-3 safe-area-bottom">
             {/* Add to Cart Button */}
             <button
               onClick={handleAddToCart}
               disabled={!selectedProduct}
-              className={`w-full py-3 font-semibold rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 ${
+              className={`w-full py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 ${
                 selectedProduct
                   ? 'bg-green-600 text-white hover:bg-green-700'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -714,6 +724,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
             
             {/* Proceed to Checkout Button */}
             <button
+              type="button"
               onClick={async () => {
                 if (!selectedProduct || !selectedProduct.variants || !selectedProduct.colors) {
                   console.error('❌ No product selected')
@@ -745,62 +756,59 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
                   // Combine selected accessories with insurance
                   const allAccessories = [...selectedAccessories, insuranceAccessory]
                   
-                  // Add to Redux cart (sync)
-                  dispatch(addToCart({
-                    product: selectedProduct,
-                    variant,
-                    color,
-                    accessories: allAccessories
-                  }))
-                  
-                  console.log('✅ Added to Redux cart, now syncing with backend...')
-                  
-                  // Wait a bit for Redux state to update
-                  await new Promise(resolve => setTimeout(resolve, 200))
-                  
-                  // Get current cart state from Redux to sync
-                  const { useSelector } = await import('react-redux')
-                  const { cartApi } = await import('@/lib/cartApi')
-                  const { cartService } = await import('@/lib/cartService')
-                  const { store } = await import('@/store/store')
-                  
-                  const cartState = store.getState().cart
-                  console.log('📦 Syncing entire cart to backend before checkout...', {
-                    itemCount: cartState.items.length
-                  })
-                  
-                  // Sync entire cart state to backend before navigation
-                  await cartService.syncEntireCartToBackend(cartState.items)
-                  
-                  console.log('✅ Cart synced successfully, navigating to checkout...')
-                  
-                  // Small delay to ensure backend has processed
-                  await new Promise(resolve => setTimeout(resolve, 300))
+            // Add to Redux cart (Redux will automatically sync to backend via cartSlice)
+            dispatch(addToCart({
+              product: selectedProduct,
+              variant,
+              color,
+              accessories: allAccessories
+            }))
+            
+            console.log('✅ Added to Redux cart, waiting for automatic backend sync...')
+            
+            // Wait for Redux's automatic backend sync to complete (300ms delay in cartSlice)
+            // Also wait a bit more to ensure backend has processed the request
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
+            console.log('✅ Cart should be synced with backend, checking authentication...')
                   
                   // Close modals
                   dispatch(closeBuyNowModal())
                   onClose()
                   
-                  // Navigate to checkout
-                  window.location.href = '/checkout'
+                  // Check if user is authenticated
+                  if (isAuthenticated) {
+                    // Navigate to checkout for authenticated users
+                    window.location.href = '/checkout'
+                  } else {
+                    // Open login modal for unauthenticated users
+                    dispatch(setAuthModalMode('login'))
+                    dispatch(setAuthModalOpen(true))
+                  }
                   
                 } catch (error) {
                   console.error('❌ Error during checkout process:', error)
-                  // Still navigate to checkout, item is in Redux at least
+                  // Still proceed with authentication check
                   dispatch(closeBuyNowModal())
                   onClose()
-                  window.location.href = '/checkout'
+                  
+                  if (isAuthenticated) {
+                    window.location.href = '/checkout'
+                  } else {
+                    dispatch(setAuthModalMode('login'))
+                    dispatch(setAuthModalOpen(true))
+                  }
                 }
               }}
               disabled={!selectedProduct}
-              className={`w-full py-3 font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
+              className={`w-full py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
                 selectedProduct
                   ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
               <CreditCard className="w-4 h-4" />
-              Proceed to Checkout
+              {isAuthenticated ? 'Proceed to Checkout' : 'Login to Checkout'}
             </button>
           </div>
         </div>
@@ -852,8 +860,8 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
             </div>
 
             {/* Plan Includes */}
-            <div className="flex items-center mb-2">
-              <span className="text-sm text-gray-600">5 year Own Damage + 5 year Third Party</span>
+            <div className="flex items-center mb-2 flex-wrap gap-1">
+              <span className="text-xs sm:text-sm text-gray-600">5 year Own Damage + 5 year Third Party</span>
               <button
                 type="button"
                 onClick={() => setIsInfoModalOpen(true)}
@@ -879,7 +887,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
             </div>
 
             {/* Insurance Required */}
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-gray-500 mt-1">
               Insurance is required by law to ride the Riqueza S1 Pro
             </div>
           </div>
@@ -888,17 +896,17 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
           <div className="w-full h-px bg-gray-200 mb-4"></div>
 
           {/* Choose Own Damage Plan */}
-          <div className="mb-6">
-            <div className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="mb-4 sm:mb-6">
+            <div className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
               Choose own damage plan
             </div>
 
             {/* Insurance Provider Logos */}
-            <div className="flex gap-3 mb-4 overflow-x-auto pb-2">
+            <div className="flex gap-2 sm:gap-3 mb-3 sm:mb-4 overflow-x-auto pb-2 scrollbar-hide">
               {insuranceProviders.map((provider) => (
                 <div
                   key={provider.id}
-                  className={`flex-shrink-0 w-12 h-12 rounded-full border-2 cursor-pointer transition-all duration-200 flex items-center justify-center ${
+                  className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 cursor-pointer transition-all duration-200 flex items-center justify-center ${
                     selectedProvider === provider.id
                       ? 'border-green-500 bg-green-50'
                       : 'border-gray-200 hover:border-gray-300'
@@ -908,7 +916,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
                   <img
                     src={provider.logo}
                     alt={provider.name}
-                    className="w-10 h-10 rounded-full object-contain"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-contain"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       // Fallback to text if image fails
@@ -926,17 +934,17 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
             </div>
 
             {/* Selected Provider Info */}
-            <div className="mb-4">
-              <div className="font-semibold text-gray-900">
+            <div className="mb-3 sm:mb-4">
+              <div className="text-sm sm:text-base font-semibold text-gray-900">
                 {insuranceProviders.find(p => p.id === selectedProvider)?.name}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-xs sm:text-sm text-gray-600">
                 ₹1,32,999 Insured Value
               </div>
             </div>
 
             {/* Plan Selection - Horizontal Scrollable */}
-            <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
+            <div className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
               {damagePlansData[selectedProvider as keyof typeof damagePlansData]?.map((plan) => (
                 <DamagePlanCard
                   key={plan.id}
@@ -954,13 +962,13 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
           </div>
 
           {/* Add-ons Section */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <div 
-              className="flex items-center justify-between cursor-pointer mb-4"
+              className="flex items-center justify-between cursor-pointer mb-3 sm:mb-4"
               onClick={() => setShowAddOns(!showAddOns)}
             >
               <div className="flex items-center gap-2">
-                <span className="text-lg font-semibold text-gray-900">Add-ons</span>
+                <span className="text-base sm:text-lg font-semibold text-gray-900">Add-ons</span>
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
@@ -1169,7 +1177,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
             // Combine selected accessories with insurance
             const allAccessories = [...selectedAccessories, insuranceAccessory]
             
-            // Add to Redux cart (sync)
+            // Add to Redux cart (Redux will automatically sync to backend via cartSlice)
             dispatch(addToCart({
               product: selectedProduct,
               variant,
@@ -1177,39 +1185,40 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
               accessories: allAccessories
             }))
             
-            console.log('✅ Added to Redux cart, now syncing with backend...')
+            console.log('✅ Added to Redux cart, waiting for automatic backend sync...')
             
-            // Wait a bit for Redux state to update
-            await new Promise(resolve => setTimeout(resolve, 200))
+            // Wait for Redux's automatic backend sync to complete (300ms delay in cartSlice)
+            // Also wait a bit more to ensure backend has processed the request
+            await new Promise(resolve => setTimeout(resolve, 500))
             
-            // Get current cart state from Redux to sync
-            const { cartService } = await import('@/lib/cartService')
-            const { store } = await import('@/store/store')
-            
-            const cartState = store.getState().cart
-            console.log('📦 Syncing entire cart to backend before checkout...', {
-              itemCount: cartState.items.length
-            })
-            
-            // Sync entire cart state to backend before navigation
-            await cartService.syncEntireCartToBackend(cartState.items)
-            
-            console.log('✅ Cart synced successfully, navigating to checkout...')
-            
-            // Small delay to ensure backend has processed
-            await new Promise(resolve => setTimeout(resolve, 300))
+            console.log('✅ Cart should be synced with backend, checking authentication...')
             
             // Close modals
             dispatch(closeBuyNowModal())
             onClose()
             
-            // Navigate to checkout
-            window.location.href = '/checkout'
+            // Check if user is authenticated
+            if (isAuthenticated) {
+              // Navigate to checkout for authenticated users
+              window.location.href = '/checkout'
+            } else {
+              // Open login modal for unauthenticated users
+              dispatch(setAuthModalMode('login'))
+              dispatch(setAuthModalOpen(true))
+            }
             
           } catch (error) {
             console.error('❌ Error during checkout process:', error)
-            // Still navigate to checkout, item is in Redux at least
-            window.location.href = '/checkout'
+            // Still proceed with authentication check
+            dispatch(closeBuyNowModal())
+            onClose()
+            
+            if (isAuthenticated) {
+              window.location.href = '/checkout'
+            } else {
+              dispatch(setAuthModalMode('login'))
+              dispatch(setAuthModalOpen(true))
+            }
           }
         }}
         disabled={!selectedProduct}
@@ -1220,7 +1229,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
         }`}
       >
         <CreditCard className="w-4 h-4" />
-        Proceed to Checkout
+        {isAuthenticated ? 'Proceed to Checkout' : 'Login to Checkout'}
       </button>
         </div>
       </div>

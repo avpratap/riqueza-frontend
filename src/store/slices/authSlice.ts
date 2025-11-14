@@ -99,9 +99,33 @@ export const sendOTP = createAsyncThunk(
         throw new Error('OTP can only be sent from client side')
       }
 
+      // Get API base URL from environment variable or use default
+      let API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || ''
+      
+      // If not set, use default localhost
+      if (!API_BASE_URL) {
+        API_BASE_URL = 'http://localhost:5000/api'
+      } else {
+        // Normalize the URL - remove trailing slashes
+        API_BASE_URL = API_BASE_URL.replace(/\/+$/, '')
+        // If it doesn't end with /api, add it
+        if (!API_BASE_URL.endsWith('/api')) {
+          API_BASE_URL = `${API_BASE_URL}/api`
+        }
+      }
+      
+      const fullUrl = `${API_BASE_URL}/auth/send-otp`
+      
+      console.log('📤 Sending OTP request:', { 
+        phoneNumber, 
+        envVar: process.env.NEXT_PUBLIC_API_URL,
+        apiUrl: API_BASE_URL, 
+        fullUrl,
+        method: 'POST'
+      })
       
       // Call our backend SMS API
-      const response = await fetch('http://localhost:5000/api/auth/send-otp', {
+      const response = await fetch(fullUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,9 +133,39 @@ export const sendOTP = createAsyncThunk(
         body: JSON.stringify({ phoneNumber }),
       })
       
+      // Check if response is ok before parsing JSON
+      if (!response.ok) {
+        let errorMessage = 'Failed to send OTP'
+        let errorData: any = {}
+        try {
+          errorData = await response.json()
+          errorMessage = errorData.error || errorData.message || errorMessage
+          console.error('❌ OTP request failed:', {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorData.error,
+            message: errorData.message,
+            path: errorData.path,
+            method: errorData.method,
+            originalUrl: errorData.originalUrl,
+            fullUrl,
+            apiUrl: API_BASE_URL
+          })
+        } catch {
+          // If JSON parsing fails, use status text
+          errorMessage = response.statusText || `Server error (${response.status})`
+          console.error('❌ OTP request failed (could not parse response):', {
+            status: response.status,
+            statusText: response.statusText,
+            fullUrl
+          })
+        }
+        throw new Error(errorMessage)
+      }
+      
       const data = await response.json()
       
-      if (!response.ok || !data.success) {
+      if (!data.success) {
         throw new Error(data.error || 'Failed to send OTP')
       }
       
@@ -124,7 +178,17 @@ export const sendOTP = createAsyncThunk(
       }
       
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to send OTP')
+      // Provide more descriptive error messages
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('Connection refused')) {
+        return rejectWithValue('Unable to connect to server. Please check if the backend server is running on port 5000.')
+      }
+      if (error.message.includes('Route not found') || error.message.includes('404') || error.message.includes('endpoint not found')) {
+        return rejectWithValue('API endpoint not found. Please verify the backend server is running and configured correctly.')
+      }
+      // Extract and return the actual error message from the backend
+      const errorMessage = error.message || 'Failed to send OTP'
+      console.error('❌ Send OTP Error:', errorMessage, 'API URL:', process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')
+      return rejectWithValue(errorMessage)
     }
   }
 )
@@ -142,7 +206,25 @@ export const verifyOTPOnly = createAsyncThunk(
         throw new Error('OTP can only be verified from client side')
       }
 
-      const response = await fetch('http://localhost:5000/api/auth/verify-otp-only', {
+      // Get API base URL from environment variable or use default
+      let API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || ''
+      
+      // If not set, use default localhost
+      if (!API_BASE_URL) {
+        API_BASE_URL = 'http://localhost:5000/api'
+      } else {
+        // Normalize the URL - remove trailing slashes
+        API_BASE_URL = API_BASE_URL.replace(/\/+$/, '')
+        // If it doesn't end with /api, add it
+        if (!API_BASE_URL.endsWith('/api')) {
+          API_BASE_URL = `${API_BASE_URL}/api`
+        }
+      }
+
+      const fullUrl = `${API_BASE_URL}/auth/verify-otp-only`
+      console.log('📤 Verify OTP Only request:', { fullUrl, phoneNumber })
+      
+      const response = await fetch(fullUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,14 +236,28 @@ export const verifyOTPOnly = createAsyncThunk(
         }),
       })
       
+      if (!response.ok) {
+        let errorMessage = 'Invalid OTP'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorMessage
+        } catch {
+          errorMessage = response.statusText || `Server error (${response.status})`
+        }
+        throw new Error(errorMessage)
+      }
+      
       const data = await response.json()
       
-      if (!response.ok || !data.success) {
+      if (!data.success) {
         throw new Error(data.error || 'Invalid OTP')
       }
       
       return { success: true }
     } catch (error: any) {
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        return rejectWithValue('Unable to connect to server. Please check if the backend server is running.')
+      }
       return rejectWithValue(error.message || 'Invalid OTP')
     }
   }
@@ -190,7 +286,25 @@ export const verifyOTP = createAsyncThunk(
           throw new Error('Name is required for signup')
         }
         
-        const response = await fetch('http://localhost:5000/api/auth/signup', {
+        // Get API base URL from environment variable or use default
+        let API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || ''
+        
+        // If not set, use default localhost
+        if (!API_BASE_URL) {
+          API_BASE_URL = 'http://localhost:5000/api'
+        } else {
+          // Normalize the URL - remove trailing slashes
+          API_BASE_URL = API_BASE_URL.replace(/\/+$/, '')
+          // If it doesn't end with /api, add it
+          if (!API_BASE_URL.endsWith('/api')) {
+            API_BASE_URL = `${API_BASE_URL}/api`
+          }
+        }
+        
+        const fullUrl = `${API_BASE_URL}/auth/signup`
+        console.log('📤 Signup request:', { fullUrl, phoneNumber, name })
+        
+        const response = await fetch(fullUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -204,9 +318,20 @@ export const verifyOTP = createAsyncThunk(
           }),
         })
         
+        if (!response.ok) {
+          let errorMessage = 'Signup failed'
+          try {
+            const errorData = await response.json()
+            errorMessage = errorData.error || errorMessage
+          } catch {
+            errorMessage = response.statusText || `Server error (${response.status})`
+          }
+          throw new Error(errorMessage)
+        }
+        
         const data = await response.json()
         
-        if (!response.ok || !data.success) {
+        if (!data.success) {
           throw new Error(data.error || 'Signup failed')
         }
         
@@ -216,7 +341,25 @@ export const verifyOTP = createAsyncThunk(
         }
       } else {
         // Login flow: Call backend login API
-        const response = await fetch('http://localhost:5000/api/auth/login', {
+        // Get API base URL from environment variable or use default
+        let API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || ''
+        
+        // If not set, use default localhost
+        if (!API_BASE_URL) {
+          API_BASE_URL = 'http://localhost:5000/api'
+        } else {
+          // Normalize the URL - remove trailing slashes
+          API_BASE_URL = API_BASE_URL.replace(/\/+$/, '')
+          // If it doesn't end with /api, add it
+          if (!API_BASE_URL.endsWith('/api')) {
+            API_BASE_URL = `${API_BASE_URL}/api`
+          }
+        }
+        
+        const fullUrl = `${API_BASE_URL}/auth/login`
+        console.log('📤 Login request:', { fullUrl, phoneNumber })
+        
+        const response = await fetch(fullUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -228,9 +371,20 @@ export const verifyOTP = createAsyncThunk(
           }),
         })
         
+        if (!response.ok) {
+          let errorMessage = 'Login failed'
+          try {
+            const errorData = await response.json()
+            errorMessage = errorData.error || errorMessage
+          } catch {
+            errorMessage = response.statusText || `Server error (${response.status})`
+          }
+          throw new Error(errorMessage)
+        }
+        
         const data = await response.json()
         
-        if (!response.ok || !data.success) {
+        if (!data.success) {
           throw new Error(data.error || 'Login failed')
         }
         
@@ -241,6 +395,9 @@ export const verifyOTP = createAsyncThunk(
       }
       
     } catch (error: any) {
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        return rejectWithValue('Unable to connect to server. Please check if the backend server is running.')
+      }
       return rejectWithValue(error.message || 'Invalid OTP')
     }
   }

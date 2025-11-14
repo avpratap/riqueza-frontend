@@ -49,8 +49,13 @@ const Header = ({ hideCenterAndRight = false }: HeaderProps) => {
         }
         
         setHasLoadedCart(true)
-      } catch (error) {
-        console.error('❌ Failed to load cart from backend:', error)
+      } catch (error: any) {
+        // Only log error if it's not a connection issue (backend not running is expected in some cases)
+        if (!error?.message?.includes('Failed to fetch') && !error?.message?.includes('Connection refused')) {
+          console.error('❌ Failed to load cart from backend:', error)
+        } else {
+          console.log('ℹ️ Backend server not available, using local cart only')
+        }
         setHasLoadedCart(true)
       }
     }

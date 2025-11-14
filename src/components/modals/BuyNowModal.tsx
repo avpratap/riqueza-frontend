@@ -26,6 +26,7 @@ import ComparisonModal from './ComparisonModal'
 import AddOnsModal from './AddOnsModal'
 import InsuranceModal from './InsuranceModal'
 import PdfModal from './PdfModal'
+import { useModalHistory } from '@/hooks/useModalHistory'
 
 interface BuyNowModalProps {
   isOpen: boolean
@@ -36,6 +37,13 @@ interface BuyNowModalProps {
 const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
   const dispatch = useDispatch<AppDispatch>()
   const { accessories } = useSelector((state: RootState) => state.products)
+  
+  // Handle browser back button
+  useModalHistory({
+    isOpen,
+    onClose,
+    modalId: 'buy-now-modal'
+  })
   
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [selectedColor, setSelectedColor] = useState<string>('')
@@ -272,7 +280,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
       <div className="flex flex-col lg:flex-row h-full" style={{ height: '100vh', margin: 0, padding: 0, overflow: 'hidden' }}>
         {/* Left Section - Image Gallery */}
         <div
-          className="flex-1 relative bg-gray-100 lg:flex-1 h-[50vh] lg:h-full"
+          className="flex-1 relative bg-gray-100 lg:flex-1 h-[40vh] sm:h-[50vh] lg:h-full"
           style={{
             margin: 0,
             padding: 0,
@@ -289,7 +297,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
 
           {/* Main Image */}
           <div 
-            className="absolute inset-0 bg-gray-200 z-10 h-[50vh] lg:h-full" 
+            className="absolute inset-0 bg-gray-200 z-10 h-[40vh] sm:h-[50vh] lg:h-full" 
             style={{ 
               width: '100%',
               margin: 0,
@@ -341,12 +349,13 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
 
               {/* Image Thumbnails */}
               {sortedImages.length > 0 && (
-                <div className="absolute top-4 right-4 flex flex-row gap-2 z-20">
+                <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex flex-row gap-1.5 sm:gap-2 z-20 max-w-[calc(100%-4rem)] sm:max-w-none overflow-x-auto scrollbar-hide">
                   {sortedImages.map((image, index) => (
                     <button
                       key={image.id}
+                      type="button"
                       onClick={() => setCurrentImageIndex(index)}
-                      className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                      className={`flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                         currentImageIndex === index ? 'border-white' : 'border-white/30'
                       }`}
                     >
@@ -363,38 +372,39 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
         </div>
 
         {/* Right Section - Purchase Panel */}
-        <div className="w-full lg:w-96 bg-white flex flex-col h-[50vh] lg:h-full">
+        <div className="w-full lg:w-96 bg-white flex flex-col h-[60vh] sm:h-[50vh] lg:h-full">
           {/* Header */}
-          <div className="flex-shrink-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
+          <div className="flex-shrink-0 bg-white border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
+            <button type="button" onClick={onClose} className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full flex-shrink-0">
               <img 
                 src="https://assets.olaelectric.com/olaelectric-videos/configs-static/overlay-config-json/olaTechPack/backButton.svg"
                 alt="back"
-                className="w-6 h-6"
+                className="w-5 h-5 sm:w-6 sm:h-6"
               />
             </button>
             <div 
-              className="text-xs text-gray-500 flex items-center gap-1 cursor-pointer hover:text-gray-700 transition-colors"
+              className="text-[10px] sm:text-xs text-gray-500 flex items-center gap-1 cursor-pointer hover:text-gray-700 transition-colors flex-1 min-w-0 justify-end"
               onClick={() => setIsDeliveryModalOpen(true)}
             >
-              DELIVERING TO 
+              <span className="whitespace-nowrap">DELIVERING TO</span>
               <span className="font-semibold text-gray-900">{deliveryAddress.pincode}</span>
-              <ChevronDown className="w-3 h-3" />
+              <ChevronDown className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
             </div>
           </div>
 
           {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto custom-scrollbar pb-20 sm:pb-4">
             {/* Color Selection */}
-             <div className="px-4 py-4 border-b border-gray-100">
-               <div className="text-xs text-gray-500 mb-2">COLOR •</div>
-               <div className="text-lg font-medium mb-3">{colors.find(c => c.id === selectedColor)?.name || 'Select Color'}</div>
-              <div className="flex gap-3">
+             <div className="px-3 sm:px-4 py-3 sm:py-4 border-b border-gray-100">
+               <div className="text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">COLOR •</div>
+               <div className="text-base sm:text-lg font-medium mb-2 sm:mb-3">{colors.find(c => c.id === selectedColor)?.name || 'Select Color'}</div>
+              <div className="flex gap-2 sm:gap-3">
                 {colors.map((color) => (
                   <button
                     key={color.id}
+                    type="button"
                     onClick={() => setSelectedColor(color.id)}
-                    className={`w-10 h-10 rounded-full border-3 ${
+                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 sm:border-[3px] flex-shrink-0 ${
                       selectedColor === color.id ? 'border-green-400' : 'border-gray-300'
                     }`}
                     style={{ backgroundColor: color.color_code }}
@@ -404,8 +414,8 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
             </div>
 
                 {/* Variant Selection */}
-                <div className="px-4 py-4 border-b border-gray-100">
-                  <div className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
+                <div className="px-3 sm:px-4 py-3 sm:py-4 border-b border-gray-100">
+                  <div className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3 uppercase tracking-wide">
                     CHOOSE VARIANT
                   </div>
                   
@@ -617,14 +627,14 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
             </div> */}
 
             {/* Accessories */}
-            <div className="px-4 py-4 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Explore accessories</h2>
-              <div className="space-y-3">
+            <div className="px-3 sm:px-4 py-3 sm:py-4 border-b border-gray-100">
+              <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Explore accessories</h2>
+              <div className="space-y-2 sm:space-y-3">
                 {accessories.map((accessory, index) => (
                   <div key={accessory.id} className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                    <div className="flex items-start p-4 gap-4">
+                    <div className="flex items-start p-3 sm:p-4 gap-3 sm:gap-4">
                       {/* Left Section: Image - Made Bigger */}
-                      <div className="w-28 h-28 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
                         <img
                           className="w-full h-full object-cover"
                           src={accessory.image_url}
@@ -635,20 +645,21 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
                         />
                       </div>
                       {/* Right Section: Product Details */}
-                      <div className="flex-1 min-w-0 flex flex-col justify-between h-28">
+                      <div className="flex-1 min-w-0 flex flex-col justify-between min-h-[5rem] sm:min-h-[7rem]">
                         <div>
-                          <div className="text-sm font-semibold text-gray-900 mb-1 leading-tight">
+                          <div className="text-xs sm:text-sm font-semibold text-gray-900 mb-1 leading-tight">
                             {accessory.name}
                           </div>
-                          <div className="text-lg font-bold text-gray-900">
+                          <div className="text-base sm:text-lg font-bold text-gray-900">
                             ₹{accessory.price.toLocaleString('en-IN')}
                           </div>
                         </div>
                         {/* Add Button - Aligned to bottom right */}
-                        <div className="flex justify-end">
+                        <div className="flex justify-end mt-2">
                           <button 
+                            type="button"
                             onClick={() => toggleAccessory(accessory.id)}
-                            className={`px-4 py-2 font-semibold rounded-md text-sm transition-colors ${
+                            className={`px-3 sm:px-4 py-1.5 sm:py-2 font-semibold rounded-md text-xs sm:text-sm transition-colors ${
                               addedAccessories[accessory.id]
                                 ? 'bg-green-500 text-white hover:bg-green-600'
                                 : 'bg-green-100 text-green-700 hover:bg-green-200'
@@ -665,9 +676,9 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
             </div>
 
             {/* Terms and Conditions */}
-            <div className="px-4 py-4 border-t border-gray-100">
-              <div className="flex items-center gap-3">
-                <div className="relative">
+            <div className="px-3 sm:px-4 py-3 sm:py-4 border-t border-gray-100">
+              <div className="flex items-start gap-2 sm:gap-3">
+                <div className="relative flex-shrink-0 mt-0.5">
                   <input
                     type="checkbox"
                     id="terms"
@@ -677,22 +688,23 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
                   />
                   <label 
                     htmlFor="terms" 
-                    className={`flex items-center justify-center w-5 h-5 border-2 rounded cursor-pointer transition-colors ${
+                    className={`flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 border-2 rounded cursor-pointer transition-colors ${
                       agreeTerms 
                         ? 'bg-green-500 border-green-500' 
                         : 'bg-white border-gray-300 hover:border-green-400'
                     }`}
                   >
                     {agreeTerms && (
-                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     )}
                   </label>
                 </div>
-                <label htmlFor="terms" className="text-sm text-gray-900 leading-tight cursor-pointer">
+                <label htmlFor="terms" className="text-xs sm:text-sm text-gray-900 leading-relaxed cursor-pointer flex-1">
                   I agree to the{' '}
                   <button 
+                    type="button"
                     className="text-blue-600 underline hover:text-blue-800 font-medium"
                     onClick={(e) => {
                       e.preventDefault()
@@ -703,6 +715,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
                   </button>
                   {' '}and{' '}
                   <button 
+                    type="button"
                     className="text-blue-600 underline hover:text-blue-800 font-medium"
                     onClick={(e) => {
                       e.preventDefault()
@@ -717,7 +730,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
           </div>
 
           {/* Fixed Bottom Section - ROI + Pricing */}
-          <div className="flex-shrink-0 bg-white border-t border-gray-200">
+          <div className="flex-shrink-0 bg-white border-t border-gray-200 safe-area-bottom">
             {/* ROI Banner */}
             {/* <div className="px-4 py-3 bg-green-500 text-white flex items-center justify-between cursor-pointer hover:bg-green-600 transition-colors">
               <div className="flex items-center gap-2">
@@ -728,15 +741,15 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
             </div> */}
             
             {/* Pricing and Button Section */}
-            <div className="px-4 py-4">
-              <div className="flex items-start justify-between gap-4">
+            <div className="px-3 sm:px-4 py-3 sm:py-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
                 {/* Left: Pricing Information */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-2xl font-bold text-gray-900">
+                <div className="flex-1 min-w-0 w-full sm:w-auto">
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                    <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
                       ₹{calculateTotalPrice().toLocaleString('en-IN')}
                     </span>
-                    <Info className="w-4 h-4 text-gray-400" />
+                    <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />
                   </div>
                   {/* <div className="text-sm text-gray-500 line-through mb-1">
                     ₹{selectedVariantData?.price?.toLocaleString('en-IN') || '0'}
@@ -744,7 +757,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
                   {(() => {
                     const accessoriesInfo = getAddedAccessoriesInfo();
                     return accessoriesInfo.addedCount > 0 && (
-                      <div className="text-sm text-green-600 mb-1">
+                      <div className="text-xs sm:text-sm text-green-600 mb-1 leading-tight">
                         + {accessoriesInfo.addedCount} accessories added (₹{accessoriesInfo.accessoryTotal.toLocaleString('en-IN')})
                       </div>
                     );
@@ -755,11 +768,12 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
                 </div>
                 
                 {/* Right: Continue Button */}
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 w-full sm:w-auto">
                   <button
+                    type="button"
                     disabled={!agreeTerms || !selectedVariant || !selectedColor}
                     onClick={() => agreeTerms && setIsAddOnsModalOpen(true)}
-                    className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                    className={`w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg font-semibold transition-all duration-200 ${
                       agreeTerms && selectedVariant && selectedColor
                         ? 'bg-black text-white hover:bg-gray-800'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'

@@ -171,7 +171,7 @@ const OTPVerification = ({ phoneNumber, mode, onBack, onSuccess }: OTPVerificati
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8">
+    <div className="w-full">
       <div className="text-center mb-8">
         <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <Shield className="w-8 h-8 text-white" />

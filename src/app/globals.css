@@ -183,6 +183,11 @@
   height: 100vh !important;
 }
 
+/* Safe area bottom for mobile devices with notches */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 /* Hide scrollbar for damage plans */
 .hide-scrollbar {
   -ms-overflow-style: none;  /* Internet Explorer 10+ */

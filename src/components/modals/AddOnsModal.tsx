@@ -10,6 +10,7 @@ import EssentialCareModal from './EssentialCareModal'
 import RiquezaCareModal from './RiquezaCareModal'
 import ExtendedWarrantyModal from './ExtendedWarrantyModal'
 import InsuranceModal from './InsuranceModal'
+import { useModalHistory } from '@/hooks/useModalHistory'
 
 interface AddOnsModalProps {
   isOpen: boolean
@@ -25,6 +26,13 @@ interface AddOnsModalProps {
 const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded, selectedVariant, selectedColor, selectedAccessories }: AddOnsModalProps) => {
   const dispatch = useDispatch<AppDispatch>()
   const { selectedProduct } = useSelector((state: RootState) => state.products)
+  
+  // Handle browser back button
+  useModalHistory({
+    isOpen,
+    onClose,
+    modalId: 'add-ons-modal'
+  })
   
   const [addedAddOns, setAddedAddOns] = useState<Record<string, boolean>>({
     extendedWarranty: true, // Extended Warranty is pre-added as shown in screenshot
@@ -227,18 +235,18 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
             </div>
 
             {/* Header */}
-            <div className="text-center text-xl font-bold text-gray-900 mt-24 px-4 mb-8">
+            <div className="text-center text-lg sm:text-xl font-bold text-gray-900 mt-20 sm:mt-24 px-3 sm:px-4 mb-4 sm:mb-8">
               Choose Add-Ons
             </div>
 
             {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar px-4 pb-6">
+            <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 pb-20 sm:pb-6">
               {/* Add-Ons Grid */}
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-3 sm:gap-4">
                 {addOnsData.map((addon) => (
                   <div key={addon.id} className="bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col">
                     {/* Add-On Image */}
-                    <div className="h-32 bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-2">
+                    <div className="h-24 sm:h-32 bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-1.5 sm:p-2">
                       <img
                         src={addon.imageUrl}
                         alt={addon.title}
@@ -247,39 +255,39 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
                     </div>
                     
                     {/* Add-On Details */}
-                    <div className="p-4 flex flex-col flex-1">
+                    <div className="p-3 sm:p-4 flex flex-col flex-1">
                       {/* Title */}
-                      <div className="mb-2">
+                      <div className="mb-1.5 sm:mb-2">
                         <img
                           src={addon.titleImageUrl}
                           alt={addon.title}
-                          className="h-5 object-contain"
+                          className="h-4 sm:h-5 object-contain"
                         />
                       </div>
                       
                       {/* Description */}
-                      <div className="text-sm text-gray-600 mb-4 flex-1 leading-relaxed">
+                      <div className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 flex-1 leading-relaxed">
                         {addon.description}
                       </div>
                       
                       {/* Price */}
-                      <div className="mb-4">
+                      <div className="mb-3 sm:mb-4">
                         {addon.oldPrice ? (
-                          <div className="space-y-1">
-                            <div className="text-sm text-gray-500 line-through">
+                          <div className="space-y-0.5 sm:space-y-1">
+                            <div className="text-xs sm:text-sm text-gray-500 line-through">
                               ₹ {parseInt(addon.oldPrice).toLocaleString('en-IN')}
                             </div>
-                            <div className="text-base font-bold text-gray-900">
+                            <div className="text-sm sm:text-base font-bold text-gray-900">
                               ₹ {parseInt(addon.price).toLocaleString('en-IN')}
-                              {addon.hasGST && <span className="text-sm text-gray-500"> + GST</span>}
+                              {addon.hasGST && <span className="text-xs sm:text-sm text-gray-500"> + GST</span>}
                             </div>
                           </div>
                         ) : (
-                          <div className="space-y-1">
-                            <div className="text-sm text-gray-500">Starting at</div>
-                            <div className="text-base font-bold text-gray-900">
+                          <div className="space-y-0.5 sm:space-y-1">
+                            <div className="text-xs sm:text-sm text-gray-500">Starting at</div>
+                            <div className="text-sm sm:text-base font-bold text-gray-900">
                               ₹ {parseInt(addon.price).toLocaleString('en-IN')}
-                              {addon.hasGST && <span className="text-sm text-gray-500"> + GST</span>}
+                              {addon.hasGST && <span className="text-xs sm:text-sm text-gray-500"> + GST</span>}
                             </div>
                           </div>
                         )}
@@ -287,8 +295,9 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
                       
                       {/* Add/Added Button */}
                       <button
+                        type="button"
                         onClick={() => toggleAddOn(addon.id)}
-                        className={`w-full py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        className={`w-full py-2 sm:py-3 px-3 sm:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
                           (addon.id === 'moveOS' ? moveOSAdded : addedAddOns[addon.id])
                             ? 'bg-green-100 text-green-700 border border-green-300 flex items-center justify-center gap-1'
                             : 'bg-green-500 text-white hover:bg-green-600'
@@ -314,10 +323,11 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
             </div>
 
             {/* Fixed Bottom Section */}
-            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4">
+            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 sm:p-4 safe-area-bottom">
               <button
+                type="button"
                 onClick={handleAddOnsToCart}
-                className="w-full py-3 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                className="w-full py-2.5 sm:py-3 text-sm sm:text-base bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors duration-200"
               >
                 Continue
               </button>

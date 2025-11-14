@@ -26,11 +26,23 @@ import { toast } from 'react-hot-toast'
 import { cartApi } from '@/lib/cartApi'
 import { cartService } from '@/lib/cartService'
 import { convertBackendCartItems, CartItemWithDatabaseId } from '@/lib/cartItemConverter'
+import { useModalHistory } from '@/hooks/useModalHistory'
 
 const CartModal = () => {
   const dispatch = useDispatch<AppDispatch>()
   const { items, totalItems, totalPrice, isOpen } = useSelector((state: RootState) => state.cart)
   const { isAuthenticated } = useSelector((state: RootState) => state.auth)
+  
+  // Handle browser back button
+  const handleClose = () => {
+    dispatch(closeCart())
+  }
+  
+  useModalHistory({
+    isOpen,
+    onClose: handleClose,
+    modalId: 'cart-modal'
+  })
   
   // State declarations
   const [isAnimating, setIsAnimating] = useState(false)

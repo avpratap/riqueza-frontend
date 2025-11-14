@@ -39,8 +39,26 @@ const SignupForm = ({ phoneNumber, verificationId, otp, onBack, onSuccess }: Sig
         return
       }
 
+      // Get API base URL from environment variable or use default
+      let API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || ''
+      
+      // If not set, use default localhost
+      if (!API_BASE_URL) {
+        API_BASE_URL = 'http://localhost:5000/api'
+      } else {
+        // Normalize the URL - remove trailing slashes
+        API_BASE_URL = API_BASE_URL.replace(/\/+$/, '')
+        // If it doesn't end with /api, add it
+        if (!API_BASE_URL.endsWith('/api')) {
+          API_BASE_URL = `${API_BASE_URL}/api`
+        }
+      }
+
+      const fullUrl = `${API_BASE_URL}/auth/signup`
+      console.log('📤 Signup form request:', { fullUrl, phoneNumber, name })
+
       // Call backend signup API
-      const response = await fetch('http://localhost:5000/api/auth/signup', {
+      const response = await fetch(fullUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +126,7 @@ const SignupForm = ({ phoneNumber, verificationId, otp, onBack, onSuccess }: Sig
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8">
+    <div className="w-full">
       <div className="text-center mb-8">
         <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <User className="w-8 h-8 text-white" />
