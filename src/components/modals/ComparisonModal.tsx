@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 interface ComparisonModalProps {
   isOpen: boolean
@@ -8,6 +8,61 @@ interface ComparisonModalProps {
 }
 
 const ComparisonModal = ({ isOpen, onClose }: ComparisonModalProps) => {
+  // Dynamic viewport height that accounts for browser chrome visibility
+  const [viewportHeight, setViewportHeight] = useState(0)
+  
+  useEffect(() => {
+    if (!isOpen) return
+    
+    const updateViewportHeight = () => {
+      // Use Visual Viewport API if available (better for mobile chrome)
+      if (typeof window !== 'undefined' && (window as any).visualViewport) {
+        const vp = (window as any).visualViewport
+        setViewportHeight(vp.height)
+      } else {
+        // Fallback to window.innerHeight
+        setViewportHeight(window.innerHeight)
+      }
+    }
+    
+    updateViewportHeight()
+    
+    // Use Visual Viewport API events if available
+    if (typeof window !== 'undefined' && (window as any).visualViewport) {
+      const vp = (window as any).visualViewport
+      vp.addEventListener('resize', updateViewportHeight)
+      vp.addEventListener('scroll', updateViewportHeight)
+      
+      return () => {
+        vp.removeEventListener('resize', updateViewportHeight)
+        vp.removeEventListener('scroll', updateViewportHeight)
+      }
+    } else {
+      // Fallback to window events
+      window.addEventListener('resize', updateViewportHeight)
+      window.addEventListener('orientationchange', updateViewportHeight)
+      
+      let scrollTimeout: NodeJS.Timeout | undefined
+      const handleScroll = () => {
+        if (scrollTimeout) clearTimeout(scrollTimeout)
+        scrollTimeout = setTimeout(updateViewportHeight, 50) // Reduced timeout for faster updates
+      }
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      
+      // Also update on focus/blur in case chrome state changes
+      window.addEventListener('focus', updateViewportHeight)
+      window.addEventListener('blur', updateViewportHeight)
+      
+      return () => {
+        window.removeEventListener('resize', updateViewportHeight)
+        window.removeEventListener('orientationchange', updateViewportHeight)
+        window.removeEventListener('scroll', handleScroll)
+        window.removeEventListener('focus', updateViewportHeight)
+        window.removeEventListener('blur', updateViewportHeight)
+        if (scrollTimeout) clearTimeout(scrollTimeout)
+      }
+    }
+  }, [isOpen])
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -71,22 +126,26 @@ const ComparisonModal = ({ isOpen, onClose }: ComparisonModalProps) => {
     { label: 'Battery Warranty', key: 'batteryWarranty' }
   ]
 
+  const modalHeight = viewportHeight > 0 ? `${viewportHeight}px` : '100vh'
+
   if (!isOpen) return null
 
   return (
     <div 
-      className="fixed inset-0 z-[60] overflow-hidden" 
-      style={{ height: '100vh', margin: 0, padding: 0 }}
+      className="fixed inset-0 z-[60] overflow-hidden touch-none" 
+      style={{ height: modalHeight, maxHeight: modalHeight, margin: 0, padding: 0, touchAction: 'none', WebkitOverflowScrolling: 'touch' }}
       onClick={handleBackdropClick}
     >
       {/* Mobile: Full screen overlay */}
-      <div className="lg:hidden absolute inset-0 bg-white">
-        <div className="w-full h-full flex flex-col bg-white"
+      <div className="lg:hidden absolute inset-0 bg-white overflow-hidden" style={{ height: modalHeight, maxHeight: modalHeight, touchAction: 'none' }}>
+        <div className="w-full h-full flex flex-col bg-white min-h-0 overflow-hidden"
           style={{
             backgroundImage: `url("https://assets.olaelectric.com/olaelectric-videos/configs-static/overlay-config-json/olaTechPack/olaCardBackground4.png")`,
+            backgroundSize: '100% auto',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'top center',
-            backgroundColor: '#f7fbfe'
+            backgroundColor: '#f7fbfe',
+            touchAction: 'none'
           }}
         >
           {/* Back Button */}
@@ -101,12 +160,12 @@ const ComparisonModal = ({ isOpen, onClose }: ComparisonModalProps) => {
           </div>
 
           {/* Header */}
-          <div className="text-center text-xl font-bold text-gray-900 mt-20 px-4 mb-6">
+          <div className="text-center text-xl font-bold text-gray-900 pt-20 px-4 pb-6 flex-shrink-0">
             Compare Models
           </div>
 
           {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar">
+          <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 pb-4" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
             {/* Variant Names and Overview */}
             <div className="px-4 py-4">
               <div className="grid grid-cols-2 gap-4">
@@ -148,7 +207,7 @@ const ComparisonModal = ({ isOpen, onClose }: ComparisonModalProps) => {
           </div>
 
           {/* Fixed Bottom Section */}
-          <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4">
+          <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4 safe-area-bottom z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
             <button
               onClick={onClose}
               className="w-full py-3 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors duration-200"
@@ -160,14 +219,14 @@ const ComparisonModal = ({ isOpen, onClose }: ComparisonModalProps) => {
       </div>
       
       {/* Desktop: Left overlay - transparent to allow scooter interaction */}
-      <div className="hidden lg:block absolute left-0 w-full h-full bg-transparent" style={{ width: 'calc(100% - 384px)' }}></div>
+      <div className="hidden lg:block absolute left-0 w-2/3 h-full bg-transparent"></div>
       
       {/* Desktop: Right modal panel */}
       <div 
-        className="hidden lg:flex absolute right-0 w-96 h-full flex flex-col bg-white"
+        className="hidden lg:flex absolute right-0 w-1/3 h-full flex flex-col bg-white"
         style={{
           backgroundImage: `url("https://assets.olaelectric.com/olaelectric-videos/configs-static/overlay-config-json/olaTechPack/olaCardBackground4.png")`,
-          backgroundSize: 'contain',
+          backgroundSize: '100% auto',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'top center',
           backgroundColor: '#f7fbfe'
@@ -190,7 +249,7 @@ const ComparisonModal = ({ isOpen, onClose }: ComparisonModalProps) => {
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 pb-4" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
           {/* Variant Names and Overview */}
           <div className="px-4 py-4">
             <div className="grid grid-cols-2 gap-4">
@@ -232,7 +291,7 @@ const ComparisonModal = ({ isOpen, onClose }: ComparisonModalProps) => {
         </div>
 
         {/* Fixed Bottom Section */}
-        <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4">
+        <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
           <button
             onClick={onClose}
             className="w-full py-3 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors duration-200"

@@ -204,23 +204,57 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
     onContinue(allAccessories)
   }
 
+  // Dynamic viewport height that accounts for browser chrome visibility
+  const [viewportHeight, setViewportHeight] = useState(0)
+  
+  useEffect(() => {
+    if (!isOpen) return
+    
+    const updateViewportHeight = () => {
+      setViewportHeight(window.innerHeight)
+    }
+    
+    updateViewportHeight()
+    
+    window.addEventListener('resize', updateViewportHeight)
+    window.addEventListener('orientationchange', updateViewportHeight)
+    
+    let scrollTimeout: NodeJS.Timeout
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout)
+      scrollTimeout = setTimeout(updateViewportHeight, 100)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    
+    return () => {
+      window.removeEventListener('resize', updateViewportHeight)
+      window.removeEventListener('orientationchange', updateViewportHeight)
+      window.removeEventListener('scroll', handleScroll)
+      clearTimeout(scrollTimeout)
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
+
+  const modalHeight = viewportHeight > 0 ? `${viewportHeight}px` : '100vh'
 
   return (
     <>
       <div 
-        className="fixed inset-0 z-[60] overflow-hidden" 
-        style={{ height: '100vh', margin: 0, padding: 0 }}
+        className="fixed inset-0 z-[60] overflow-hidden touch-none" 
+        style={{ height: modalHeight, maxHeight: modalHeight, margin: 0, padding: 0, touchAction: 'none', WebkitOverflowScrolling: 'touch' }}
         onClick={handleBackdropClick}
       >
         {/* Mobile: Full screen overlay */}
-        <div className="lg:hidden absolute inset-0 bg-white">
-          <div className="w-full h-full flex flex-col bg-white"
+        <div className="lg:hidden absolute inset-0 bg-white overflow-hidden" style={{ height: modalHeight, maxHeight: modalHeight, touchAction: 'none' }}>
+          <div className="w-full h-full flex flex-col bg-white min-h-0 overflow-hidden"
             style={{
               backgroundImage: `url("https://assets.olaelectric.com/olaelectric-videos/configs-static/overlay-config-json/olaTechPack/olaCardBackground4.png")`,
+              backgroundSize: '100% auto',
               backgroundRepeat: 'no-repeat',
               backgroundPosition: 'top center',
-              backgroundColor: '#f7fbfe'
+              backgroundColor: '#f7fbfe',
+              touchAction: 'none'
             }}
           >
             {/* Back Button */}
@@ -235,12 +269,12 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
             </div>
 
             {/* Header */}
-            <div className="text-center text-lg sm:text-xl font-bold text-gray-900 mt-20 sm:mt-24 px-3 sm:px-4 mb-4 sm:mb-8">
+            <div className="flex-shrink-0 text-center text-lg sm:text-xl font-bold text-gray-900 pt-20 sm:pt-24 px-3 sm:px-4 pb-4 sm:pb-8">
               Choose Add-Ons
             </div>
 
             {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 pb-20 sm:pb-6">
+            <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 min-h-0 pb-4" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
               {/* Add-Ons Grid */}
               <div className="grid grid-cols-1 gap-3 sm:gap-4">
                 {addOnsData.map((addon) => (
@@ -323,7 +357,7 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
             </div>
 
             {/* Fixed Bottom Section */}
-            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 sm:p-4 safe-area-bottom">
+            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 sm:p-4 safe-area-bottom z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
               <button
                 type="button"
                 onClick={handleAddOnsToCart}
@@ -336,16 +370,16 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
         </div>
         
         {/* Desktop: Right panel overlay */}
-        <div className="hidden lg:block absolute left-0 w-full h-full bg-transparent" style={{ width: 'calc(100% - 400px)' }}>
+        <div className="hidden lg:block absolute left-0 w-2/3 h-full bg-transparent">
           {/* This space is intentionally left empty to allow the underlying BuyNow modal's left section to remain interactive */}
         </div>
         
         {/* Desktop Right modal panel */}
         <div 
-          className="hidden lg:flex absolute right-0 w-96 h-full flex flex-col bg-white"
+          className="hidden lg:flex absolute right-0 w-1/3 h-full flex flex-col bg-white"
           style={{
             backgroundImage: `url("https://assets.olaelectric.com/olaelectric-videos/configs-static/overlay-config-json/olaTechPack/olaCardBackground4.png")`,
-            backgroundSize: 'contain',
+            backgroundSize: '100% auto',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'top center',
             backgroundColor: '#f7fbfe'
