@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { ChevronUp, Info, ShoppingCart, CreditCard } from 'lucide-react'
 import { RootState, AppDispatch } from '@/store/store'
@@ -387,18 +387,50 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
     }
   }
 
+  // Dynamic viewport height that accounts for browser chrome visibility
+  const [viewportHeight, setViewportHeight] = useState(0)
+  
+  useEffect(() => {
+    if (!isOpen) return
+    
+    const updateViewportHeight = () => {
+      setViewportHeight(window.innerHeight)
+    }
+    
+    updateViewportHeight()
+    
+    window.addEventListener('resize', updateViewportHeight)
+    window.addEventListener('orientationchange', updateViewportHeight)
+    
+    let scrollTimeout: NodeJS.Timeout
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout)
+      scrollTimeout = setTimeout(updateViewportHeight, 100)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    
+    return () => {
+      window.removeEventListener('resize', updateViewportHeight)
+      window.removeEventListener('orientationchange', updateViewportHeight)
+      window.removeEventListener('scroll', handleScroll)
+      clearTimeout(scrollTimeout)
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
+
+  const modalHeight = viewportHeight > 0 ? `${viewportHeight}px` : '100vh'
 
   return (
     <>
     <div 
-      className="fixed inset-0 z-[60] overflow-hidden" 
-      style={{ height: '100vh', margin: 0, padding: 0 }}
+      className="fixed inset-0 z-[60] overflow-hidden touch-none" 
+      style={{ height: modalHeight, maxHeight: modalHeight, margin: 0, padding: 0, touchAction: 'none', WebkitOverflowScrolling: 'touch' }}
       onClick={handleBackdropClick}
     >
         {/* Mobile: Full screen overlay */}
-        <div className="lg:hidden fixed inset-0 bg-white z-[60]" style={{ height: '100vh', overflow: 'hidden' }}>
-          <div className="w-full h-full flex flex-col bg-white min-h-0" style={{ backgroundColor: '#ffffff' }}>
+        <div className="lg:hidden fixed inset-0 bg-white z-[60] overflow-hidden" style={{ height: modalHeight, maxHeight: modalHeight, overflow: 'hidden', touchAction: 'none' }}>
+          <div className="w-full h-full flex flex-col bg-white min-h-0 overflow-hidden" style={{ backgroundColor: '#ffffff', touchAction: 'none' }}>
           {/* Back Button */}
           <div className="absolute top-4 left-4 z-10">
             <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full flex items-center justify-center">
@@ -421,7 +453,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
           </div>
 
           {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 py-3 sm:py-4 pt-14 sm:pt-16 min-h-0 pb-4">
+          <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 py-3 sm:py-4 pt-14 sm:pt-16 min-h-0 pb-4" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
             {/* Header */}
             <div className="mb-4 sm:mb-6">
               {/* Title and Price in same line */}
@@ -846,7 +878,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 pt-16 min-h-0 pb-4">
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 pt-16 min-h-0 pb-4" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
           {/* Header */}
           <div className="mb-6">
             {/* Title and Price in same line */}

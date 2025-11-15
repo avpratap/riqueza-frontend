@@ -45,6 +45,40 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
     modalId: 'buy-now-modal'
   })
   
+  // Dynamic viewport height that accounts for browser chrome visibility
+  const [viewportHeight, setViewportHeight] = useState(0)
+  
+  useEffect(() => {
+    if (!isOpen) return
+    
+    const updateViewportHeight = () => {
+      // Use window.innerHeight which gives actual viewport height excluding browser chrome
+      setViewportHeight(window.innerHeight)
+    }
+    
+    // Set initial height
+    updateViewportHeight()
+    
+    // Update on resize (when browser chrome shows/hides)
+    window.addEventListener('resize', updateViewportHeight)
+    window.addEventListener('orientationchange', updateViewportHeight)
+    
+    // Also update when scrolling (chrome can hide/show on scroll)
+    let scrollTimeout: NodeJS.Timeout
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout)
+      scrollTimeout = setTimeout(updateViewportHeight, 100)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    
+    return () => {
+      window.removeEventListener('resize', updateViewportHeight)
+      window.removeEventListener('orientationchange', updateViewportHeight)
+      window.removeEventListener('scroll', handleScroll)
+      clearTimeout(scrollTimeout)
+    }
+  }, [isOpen])
+  
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [selectedColor, setSelectedColor] = useState<string>('')
   const [selectedVariant, setSelectedVariant] = useState<string>('')
@@ -167,15 +201,27 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
       // Calculate scrollbar width to prevent layout shift
       const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
       
-      // Hide scroll on both html and body
+      // Hide scroll on both html and body - use position fixed to prevent all scrolling
       document.documentElement.style.overflow = 'hidden'
+      document.documentElement.style.height = '100%'
+      document.documentElement.style.position = 'fixed'
+      document.documentElement.style.width = '100%'
       document.body.style.overflow = 'hidden'
+      document.body.style.height = '100%'
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
       document.body.style.paddingRight = `${scrollbarWidth}px`
       document.body.classList.add('no-scroll')
       
       return () => {
         document.documentElement.style.overflow = originalHtmlOverflow
+        document.documentElement.style.height = ''
+        document.documentElement.style.position = ''
+        document.documentElement.style.width = ''
         document.body.style.overflow = originalBodyOverflow
+        document.body.style.height = ''
+        document.body.style.position = ''
+        document.body.style.width = ''
         document.body.style.paddingRight = originalBodyPaddingRight
         document.body.className = originalBodyClassName
       }
@@ -275,17 +321,21 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
     )
   }
 
+  // Use dynamic height or fallback to 100vh
+  const modalHeight = viewportHeight > 0 ? `${viewportHeight}px` : '100vh'
+  
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm overflow-hidden" style={{ height: '100vh', margin: 0, padding: 0 }}>
-      <div className="flex flex-col lg:flex-row h-full" style={{ height: '100vh', margin: 0, padding: 0, overflow: 'hidden' }}>
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm overflow-hidden touch-none" style={{ height: modalHeight, maxHeight: modalHeight, margin: 0, padding: 0, WebkitOverflowScrolling: 'touch' }}>
+      <div className="flex flex-col lg:flex-row h-full overflow-hidden" style={{ height: modalHeight, maxHeight: modalHeight, margin: 0, padding: 0, overflow: 'hidden', touchAction: 'none', WebkitOverflowScrolling: 'touch' }}>
         {/* Left Section - Image Gallery */}
         <div
-          className="flex-1 relative bg-gray-100 lg:flex-1 h-[40vh] sm:h-[50vh] lg:h-full"
+          className="flex-1 relative bg-gray-100 lg:flex-1 h-[40vh] sm:h-[50vh] lg:h-full overflow-hidden"
           style={{
             margin: 0,
             padding: 0,
             overflow: 'hidden',
-            zIndex: isMoveOSDetailsModalOpen || isComparisonModalOpen || isAddOnsModalOpen || isInsuranceModalOpen ? 60 : 'auto'
+            zIndex: isMoveOSDetailsModalOpen || isComparisonModalOpen || isAddOnsModalOpen || isInsuranceModalOpen ? 60 : 'auto',
+            touchAction: 'pan-y pinch-zoom'
           }}
         >
           {/* Brand Logo */}
@@ -372,7 +422,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
         </div>
 
         {/* Right Section - Purchase Panel */}
-        <div className="w-full lg:w-96 bg-white flex flex-col h-full min-h-0 max-h-screen lg:max-h-full">
+        <div className="w-full lg:w-96 bg-white flex flex-col h-full min-h-0 max-h-screen lg:max-h-full overflow-hidden" style={{ touchAction: 'none' }}>
           {/* Header */}
           <div className="flex-shrink-0 bg-white border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2 z-10">
             <button type="button" onClick={onClose} className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full flex-shrink-0">
@@ -393,7 +443,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
           </div>
 
           {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 pb-20 sm:pb-4">
+          <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 pb-20 sm:pb-4" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
             {/* Color Selection */}
              <div className="px-3 sm:px-4 py-3 sm:py-4 border-b border-gray-100">
                <div className="text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">COLOR •</div>
