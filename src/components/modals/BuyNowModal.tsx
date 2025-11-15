@@ -360,7 +360,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
       <div className="flex flex-col lg:flex-row h-full overflow-hidden" style={{ height: modalHeight, maxHeight: modalHeight, margin: 0, padding: 0, overflow: 'hidden', touchAction: 'none', WebkitOverflowScrolling: 'touch' }}>
         {/* Left Section - Image Gallery */}
         <div
-          className="relative bg-gray-100 flex-shrink-0 lg:flex-1 lg:h-full overflow-hidden"
+          className="relative bg-gray-100 flex-shrink-0 w-full lg:w-2/3 lg:h-full overflow-hidden"
           style={{
             height: imageSectionHeight,
             minHeight: imageSectionHeight,
@@ -458,7 +458,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
 
         {/* Right Section - Purchase Panel */}
         <div 
-          className="w-full lg:w-96 bg-white flex flex-col flex-1 min-h-0 overflow-hidden lg:h-full" 
+          className="w-full lg:w-1/3 bg-white flex flex-col flex-shrink-0 min-h-0 overflow-hidden lg:h-full" 
           style={{ 
             touchAction: 'none',
             height: rightPanelHeight,
@@ -768,8 +768,21 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
               </div>
             </div>
 
+          </div>
+
+          {/* Fixed Bottom Section - ROI + Pricing */}
+          <div className="flex-shrink-0 bg-white border-t border-gray-200 safe-area-bottom z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
+            {/* ROI Banner */}
+            {/* <div className="px-4 py-3 bg-green-500 text-white flex items-center justify-between cursor-pointer hover:bg-green-600 transition-colors">
+              <div className="flex items-center gap-2">
+                <Gem className="w-4 h-4" />
+                <span className="text-sm font-semibold">ROI starting 6.99%</span>
+              </div>
+              <ChevronRight className="w-4 h-4" />
+            </div> */}
+            
             {/* Terms and Conditions */}
-            <div className="px-3 sm:px-4 py-3 sm:py-4 border-t border-gray-100">
+            <div className="px-3 sm:px-4 pt-3 sm:pt-4 pb-2 sm:pb-3">
               <div className="flex items-start gap-2 sm:gap-3">
                 <div className="relative flex-shrink-0 mt-0.5">
                   <input
@@ -820,29 +833,16 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
                 </label>
               </div>
             </div>
-          </div>
-
-          {/* Fixed Bottom Section - ROI + Pricing */}
-          <div className="flex-shrink-0 bg-white border-t border-gray-200 safe-area-bottom z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
-            {/* ROI Banner */}
-            {/* <div className="px-4 py-3 bg-green-500 text-white flex items-center justify-between cursor-pointer hover:bg-green-600 transition-colors">
-              <div className="flex items-center gap-2">
-                <Gem className="w-4 h-4" />
-                <span className="text-sm font-semibold">ROI starting 6.99%</span>
-              </div>
-              <ChevronRight className="w-4 h-4" />
-            </div> */}
             
             {/* Pricing and Button Section */}
-            <div className="px-3 sm:px-4 py-3 sm:py-4">
+            <div className="px-3 sm:px-4 pb-3 sm:pb-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
                 {/* Left: Pricing Information */}
                 <div className="flex-1 min-w-0 w-full sm:w-auto">
-                  <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                  <div className="mb-1">
                     <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
                       ₹{calculateTotalPrice().toLocaleString('en-IN')}
                     </span>
-                    <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />
                   </div>
                   {/* <div className="text-sm text-gray-500 line-through mb-1">
                     ₹{selectedVariantData?.price?.toLocaleString('en-IN') || '0'}

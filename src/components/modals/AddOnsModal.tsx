@@ -250,6 +250,7 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
           <div className="w-full h-full flex flex-col bg-white min-h-0 overflow-hidden"
             style={{
               backgroundImage: `url("https://assets.olaelectric.com/olaelectric-videos/configs-static/overlay-config-json/olaTechPack/olaCardBackground4.png")`,
+              backgroundSize: '100% auto',
               backgroundRepeat: 'no-repeat',
               backgroundPosition: 'top center',
               backgroundColor: '#f7fbfe',
@@ -369,16 +370,16 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
         </div>
         
         {/* Desktop: Right panel overlay */}
-        <div className="hidden lg:block absolute left-0 w-full h-full bg-transparent" style={{ width: 'calc(100% - 400px)' }}>
+        <div className="hidden lg:block absolute left-0 w-2/3 h-full bg-transparent">
           {/* This space is intentionally left empty to allow the underlying BuyNow modal's left section to remain interactive */}
         </div>
         
         {/* Desktop Right modal panel */}
         <div 
-          className="hidden lg:flex absolute right-0 w-96 h-full flex flex-col bg-white"
+          className="hidden lg:flex absolute right-0 w-1/3 h-full flex flex-col bg-white"
           style={{
             backgroundImage: `url("https://assets.olaelectric.com/olaelectric-videos/configs-static/overlay-config-json/olaTechPack/olaCardBackground4.png")`,
-            backgroundSize: 'contain',
+            backgroundSize: '100% auto',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'top center',
             backgroundColor: '#f7fbfe'

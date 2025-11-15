@@ -17,6 +17,63 @@ const MoveOSDetailsModal = ({ isOpen, onClose, moveOSAdded, setMoveOSAdded }: Mo
   const dispatch = useDispatch<AppDispatch>()
   const { selectedProduct } = useSelector((state: RootState) => state.products)
   const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false)
+  
+  // Dynamic viewport height that accounts for browser chrome visibility
+  const [viewportHeight, setViewportHeight] = useState(0)
+  
+  useEffect(() => {
+    if (!isOpen) return
+    
+    const updateViewportHeight = () => {
+      // Use Visual Viewport API if available (better for mobile chrome)
+      if (typeof window !== 'undefined' && (window as any).visualViewport) {
+        const vp = (window as any).visualViewport
+        setViewportHeight(vp.height)
+      } else {
+        // Fallback to window.innerHeight
+        setViewportHeight(window.innerHeight)
+      }
+    }
+    
+    updateViewportHeight()
+    
+    // Use Visual Viewport API events if available
+    if (typeof window !== 'undefined' && (window as any).visualViewport) {
+      const vp = (window as any).visualViewport
+      vp.addEventListener('resize', updateViewportHeight)
+      vp.addEventListener('scroll', updateViewportHeight)
+      
+      return () => {
+        vp.removeEventListener('resize', updateViewportHeight)
+        vp.removeEventListener('scroll', updateViewportHeight)
+      }
+    } else {
+      // Fallback to window events
+      window.addEventListener('resize', updateViewportHeight)
+      window.addEventListener('orientationchange', updateViewportHeight)
+      
+      let scrollTimeout: NodeJS.Timeout | undefined
+      const handleScroll = () => {
+        if (scrollTimeout) clearTimeout(scrollTimeout)
+        scrollTimeout = setTimeout(updateViewportHeight, 50) // Reduced timeout for faster updates
+      }
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      
+      // Also update on focus/blur in case chrome state changes
+      window.addEventListener('focus', updateViewportHeight)
+      window.addEventListener('blur', updateViewportHeight)
+      
+      return () => {
+        window.removeEventListener('resize', updateViewportHeight)
+        window.removeEventListener('orientationchange', updateViewportHeight)
+        window.removeEventListener('scroll', handleScroll)
+        window.removeEventListener('focus', updateViewportHeight)
+        window.removeEventListener('blur', updateViewportHeight)
+        if (scrollTimeout) clearTimeout(scrollTimeout)
+      }
+    }
+  }, [isOpen])
+  
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -145,19 +202,23 @@ const MoveOSDetailsModal = ({ isOpen, onClose, moveOSAdded, setMoveOSAdded }: Mo
     }
   ]
 
+  const modalHeight = viewportHeight > 0 ? `${viewportHeight}px` : '100vh'
+
   if (!isOpen) return null
 
   return (
     <>
-      <div className="fixed inset-0 z-[60] overflow-hidden" style={{ height: '100vh', margin: 0, padding: 0 }}>
+      <div className="fixed inset-0 z-[60] overflow-hidden touch-none" style={{ height: modalHeight, maxHeight: modalHeight, margin: 0, padding: 0, touchAction: 'none', WebkitOverflowScrolling: 'touch' }}>
         {/* Mobile: Full screen overlay */}
-        <div className="lg:hidden absolute inset-0 bg-white">
-          <div className="w-full h-full flex flex-col bg-white"
+        <div className="lg:hidden absolute inset-0 bg-white overflow-hidden" style={{ height: modalHeight, maxHeight: modalHeight, touchAction: 'none' }}>
+          <div className="w-full h-full flex flex-col bg-white min-h-0 overflow-hidden"
             style={{
               backgroundImage: `url("https://assets.olaelectric.com/olaelectric-videos/configs-static/overlay-config-json/olaTechPack/olaCardBackground4.png")`,
+              backgroundSize: '100% auto',
               backgroundRepeat: 'no-repeat',
               backgroundPosition: 'top center',
-              backgroundColor: '#f7fbfe'
+              backgroundColor: '#f7fbfe',
+              touchAction: 'none'
             }}
           >
             {/* Back Button */}
@@ -172,7 +233,7 @@ const MoveOSDetailsModal = ({ isOpen, onClose, moveOSAdded, setMoveOSAdded }: Mo
             </div>
 
             {/* MoveOS+ Logo */}
-            <div className="mt-16 flex justify-center">
+            <div className="mt-16 flex justify-center flex-shrink-0">
               <Image
                 src="/images/MoveOS/move-os-plus-logo3.svg"
                 alt="MoveOS+"
@@ -182,12 +243,12 @@ const MoveOSDetailsModal = ({ isOpen, onClose, moveOSAdded, setMoveOSAdded }: Mo
             </div>
 
             {/* Header */}
-            <div className="text-center text-xl font-bold text-gray-900 mt-4 px-4">
+            <div className="text-center text-xl font-bold text-gray-900 mt-4 px-4 flex-shrink-0">
               Give your vehicle a tech upgrade
             </div>
 
             {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 pb-4" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
               {/* Horizontal Scrollable Features */}
               <div className="mt-8 px-4">
                 <div 
@@ -244,7 +305,7 @@ const MoveOSDetailsModal = ({ isOpen, onClose, moveOSAdded, setMoveOSAdded }: Mo
             </div>
 
             {/* Fixed Bottom Section */}
-            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4">
+            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4 safe-area-bottom z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
               {moveOSAdded ? (
                 /* Added State - Show Remove Option */
                 <>
@@ -289,14 +350,14 @@ const MoveOSDetailsModal = ({ isOpen, onClose, moveOSAdded, setMoveOSAdded }: Mo
         </div>
         
         {/* Desktop: Left overlay - transparent to allow scooter interaction */}
-        <div className="hidden lg:block absolute left-0 w-full h-full bg-transparent" style={{ width: 'calc(100% - 384px)' }}></div>
+        <div className="hidden lg:block absolute left-0 w-2/3 h-full bg-transparent"></div>
         
         {/* Desktop: Right modal panel */}
         <div 
-          className="hidden lg:flex absolute right-0 w-96 h-full flex flex-col bg-white"
+          className="hidden lg:flex absolute right-0 w-1/3 h-full flex flex-col bg-white"
           style={{
             backgroundImage: `url("https://assets.olaelectric.com/olaelectric-videos/configs-static/overlay-config-json/olaTechPack/olaCardBackground4.png")`,
-            backgroundSize: 'contain',
+            backgroundSize: '100% auto',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'top center',
             backgroundColor: '#f7fbfe'
@@ -328,8 +389,8 @@ const MoveOSDetailsModal = ({ isOpen, onClose, moveOSAdded, setMoveOSAdded }: Mo
           Give your vehicle a tech upgrade
         </div>
 
-        {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          {/* Scrollable Content Area */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 pb-4" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
           {/* Horizontal Scrollable Features */}
           <div className="mt-8 px-4">
             <div 
@@ -386,7 +447,7 @@ const MoveOSDetailsModal = ({ isOpen, onClose, moveOSAdded, setMoveOSAdded }: Mo
         </div>
 
         {/* Fixed Bottom Section */}
-        <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4">
+        <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
           {moveOSAdded ? (
             /* Added State - Show Remove Option */
             <>

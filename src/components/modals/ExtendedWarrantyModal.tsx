@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronRight, Leaf } from 'lucide-react'
 import PdfModal from './PdfModal'
 
@@ -18,6 +18,62 @@ const ExtendedWarrantyModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, i
   const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false)
   const [isWarrantyTermsModalOpen, setIsWarrantyTermsModalOpen] = useState(false)
   const [isFaqModalOpen, setIsFaqModalOpen] = useState(false)
+  
+  // Dynamic viewport height that accounts for browser chrome visibility
+  const [viewportHeight, setViewportHeight] = useState(0)
+  
+  useEffect(() => {
+    if (!isOpen) return
+    
+    const updateViewportHeight = () => {
+      // Use Visual Viewport API if available (better for mobile chrome)
+      if (typeof window !== 'undefined' && (window as any).visualViewport) {
+        const vp = (window as any).visualViewport
+        setViewportHeight(vp.height)
+      } else {
+        // Fallback to window.innerHeight
+        setViewportHeight(window.innerHeight)
+      }
+    }
+    
+    updateViewportHeight()
+    
+    // Use Visual Viewport API events if available
+    if (typeof window !== 'undefined' && (window as any).visualViewport) {
+      const vp = (window as any).visualViewport
+      vp.addEventListener('resize', updateViewportHeight)
+      vp.addEventListener('scroll', updateViewportHeight)
+      
+      return () => {
+        vp.removeEventListener('resize', updateViewportHeight)
+        vp.removeEventListener('scroll', updateViewportHeight)
+      }
+    } else {
+      // Fallback to window events
+      window.addEventListener('resize', updateViewportHeight)
+      window.addEventListener('orientationchange', updateViewportHeight)
+      
+      let scrollTimeout: NodeJS.Timeout | undefined
+      const handleScroll = () => {
+        if (scrollTimeout) clearTimeout(scrollTimeout)
+        scrollTimeout = setTimeout(updateViewportHeight, 50) // Reduced timeout for faster updates
+      }
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      
+      // Also update on focus/blur in case chrome state changes
+      window.addEventListener('focus', updateViewportHeight)
+      window.addEventListener('blur', updateViewportHeight)
+      
+      return () => {
+        window.removeEventListener('resize', updateViewportHeight)
+        window.removeEventListener('orientationchange', updateViewportHeight)
+        window.removeEventListener('scroll', handleScroll)
+        window.removeEventListener('focus', updateViewportHeight)
+        window.removeEventListener('blur', updateViewportHeight)
+        if (scrollTimeout) clearTimeout(scrollTimeout)
+      }
+    }
+  }, [isOpen])
 
   const warrantyPlans = [
     {
@@ -83,18 +139,20 @@ const ExtendedWarrantyModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, i
     }
   }
 
+  const modalHeight = viewportHeight > 0 ? `${viewportHeight}px` : '100vh'
+
   if (!isOpen) return null
 
   return (
     <>
       <div 
-        className="fixed inset-0 z-[60] overflow-hidden" 
-        style={{ height: '100vh', margin: 0, padding: 0 }}
+        className="fixed inset-0 z-[60] overflow-hidden touch-none" 
+        style={{ height: modalHeight, maxHeight: modalHeight, margin: 0, padding: 0, touchAction: 'none', WebkitOverflowScrolling: 'touch' }}
         onClick={handleBackdropClick}
       >
         {/* Mobile: Full screen overlay */}
-        <div className="lg:hidden absolute inset-0 bg-white">
-          <div className="w-full h-full flex flex-col bg-white" style={{ backgroundColor: '#ffffff' }}>
+        <div className="lg:hidden absolute inset-0 bg-white overflow-hidden" style={{ height: modalHeight, maxHeight: modalHeight, touchAction: 'none' }}>
+          <div className="w-full h-full flex flex-col bg-white min-h-0 overflow-hidden" style={{ backgroundColor: '#ffffff', touchAction: 'none' }}>
             {/* Back Button */}
             <div className="absolute top-4 left-4 z-10">
               <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200">
@@ -107,7 +165,7 @@ const ExtendedWarrantyModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, i
             </div>
 
             {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 mt-16 pb-6">
+            <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 pt-16 min-h-0 pb-4" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
               {/* Header Section with Title and Price */}
               <div className="flex items-start justify-between mb-2 mt-8">
                 <div className="flex-1 pr-4">
@@ -201,7 +259,7 @@ const ExtendedWarrantyModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, i
             </div>
 
             {/* Fixed Bottom Section */}
-            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4">
+            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4 safe-area-bottom z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
               {/* Terms and Conditions Text */}
               <div className="text-sm text-gray-600 mb-4 text-center">
                 By continuing, you agree to the{' '}
@@ -241,13 +299,13 @@ const ExtendedWarrantyModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, i
         </div>
         
         {/* Desktop: Left overlay - transparent to allow interaction with underlying BuyNow modal */}
-        <div className="hidden lg:block absolute left-0 w-full h-full bg-transparent" style={{ width: 'calc(100% - 400px)' }}>
+        <div className="hidden lg:block absolute left-0 w-2/3 h-full bg-transparent">
           {/* This space is intentionally left empty to allow the underlying BuyNow modal's left section to remain interactive */}
         </div>
         
         {/* Desktop: Right modal panel */}
         <div 
-          className="hidden lg:flex absolute right-0 w-96 h-full flex flex-col bg-white"
+          className="hidden lg:flex absolute right-0 w-1/3 h-full flex flex-col bg-white"
           style={{
             backgroundColor: '#ffffff'
           }}
@@ -264,7 +322,7 @@ const ExtendedWarrantyModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, i
           </div>
 
           {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 mt-16 pb-6">
+          <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 pt-16 min-h-0 pb-4" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
             {/* Header Section with Title and Price */}
             <div className="flex items-start justify-between mb-2 mt-8">
               <div className="flex-1 pr-4">
@@ -358,7 +416,7 @@ const ExtendedWarrantyModal = ({ isOpen, onClose, onAdd, onRemove, onContinue, i
           </div>
 
           {/* Fixed Bottom Section */}
-          <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4">
+          <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
             {/* Terms and Conditions Text */}
             <div className="text-sm text-gray-600 mb-4 text-center">
               By continuing, you agree to the{' '}

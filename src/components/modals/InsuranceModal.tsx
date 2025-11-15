@@ -847,13 +847,13 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
       </div>
       
       {/* Desktop: Left overlay - transparent to allow interaction with underlying BuyNow modal */}
-      <div className="hidden lg:block absolute left-0 w-full h-full bg-transparent" style={{ width: 'calc(100% - 400px)' }}>
+      <div className="hidden lg:block absolute left-0 w-2/3 h-full bg-transparent">
         {/* This space is intentionally left empty to allow the underlying BuyNow modal's left section to remain interactive */}
       </div>
       
       {/* Desktop: Right modal panel */}
       <div 
-        className="hidden lg:flex absolute right-0 w-96 h-full flex flex-col bg-white"
+        className="hidden lg:flex absolute right-0 w-1/3 h-full flex flex-col bg-white"
         style={{ backgroundColor: '#ffffff' }}
       >
         {/* Back Button */}
