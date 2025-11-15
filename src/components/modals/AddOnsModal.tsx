@@ -215,7 +215,7 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
       >
         {/* Mobile: Full screen overlay */}
         <div className="lg:hidden absolute inset-0 bg-white">
-          <div className="w-full h-full flex flex-col bg-white"
+          <div className="w-full h-full flex flex-col bg-white min-h-0"
             style={{
               backgroundImage: `url("https://assets.olaelectric.com/olaelectric-videos/configs-static/overlay-config-json/olaTechPack/olaCardBackground4.png")`,
               backgroundRepeat: 'no-repeat',
@@ -235,12 +235,12 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
             </div>
 
             {/* Header */}
-            <div className="text-center text-lg sm:text-xl font-bold text-gray-900 mt-20 sm:mt-24 px-3 sm:px-4 mb-4 sm:mb-8">
+            <div className="flex-shrink-0 text-center text-lg sm:text-xl font-bold text-gray-900 pt-20 sm:pt-24 px-3 sm:px-4 pb-4 sm:pb-8">
               Choose Add-Ons
             </div>
 
             {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 min-h-0 pb-24 sm:pb-6">
+            <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 min-h-0 pb-4">
               {/* Add-Ons Grid */}
               <div className="grid grid-cols-1 gap-3 sm:gap-4">
                 {addOnsData.map((addon) => (
@@ -323,7 +323,7 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
             </div>
 
             {/* Fixed Bottom Section */}
-            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 sm:p-4 safe-area-bottom sticky bottom-0 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
+            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 sm:p-4 safe-area-bottom z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
               <button
                 type="button"
                 onClick={handleAddOnsToCart}

@@ -398,7 +398,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
     >
         {/* Mobile: Full screen overlay */}
         <div className="lg:hidden fixed inset-0 bg-white z-[60]" style={{ height: '100vh', overflow: 'hidden' }}>
-          <div className="w-full h-full flex flex-col bg-white" style={{ backgroundColor: '#ffffff' }}>
+          <div className="w-full h-full flex flex-col bg-white min-h-0" style={{ backgroundColor: '#ffffff' }}>
           {/* Back Button */}
           <div className="absolute top-4 left-4 z-10">
             <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full flex items-center justify-center">
@@ -421,7 +421,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
           </div>
 
           {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 py-3 sm:py-4 mt-14 sm:mt-16 min-h-0 pb-24 sm:pb-6">
+          <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 py-3 sm:py-4 pt-14 sm:pt-16 min-h-0 pb-4">
             {/* Header */}
             <div className="mb-4 sm:mb-6">
               {/* Title and Price in same line */}
@@ -707,7 +707,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
           </div>
 
           {/* Fixed Bottom Section */}
-          <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-3 sm:p-4 space-y-2 sm:space-y-3 safe-area-bottom sticky bottom-0 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
+          <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-3 sm:p-4 space-y-2 sm:space-y-3 safe-area-bottom z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
             {/* Add to Cart Button */}
             <button
               onClick={handleAddToCart}
@@ -846,7 +846,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 mt-16 min-h-0 pb-6">
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 pt-16 min-h-0 pb-4">
           {/* Header */}
           <div className="mb-6">
             {/* Title and Price in same line */}
@@ -1129,7 +1129,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
         </div>
 
         {/* Fixed Bottom Section */}
-        <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-4 space-y-3 sticky bottom-0 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
+        <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-4 space-y-3 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
           {/* Add to Cart Button */}
           <button
             onClick={handleAddToCart}
