@@ -47,6 +47,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
   
   // Dynamic viewport height that accounts for browser chrome visibility
   const [viewportHeight, setViewportHeight] = useState(0)
+  const [windowWidth, setWindowWidth] = useState(0)
   
   useEffect(() => {
     if (!isOpen) return
@@ -54,12 +55,13 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
     const updateViewportHeight = () => {
       // Use window.innerHeight which gives actual viewport height excluding browser chrome
       setViewportHeight(window.innerHeight)
+      setWindowWidth(window.innerWidth)
     }
     
     // Set initial height
     updateViewportHeight()
     
-    // Update on resize (when browser chrome shows/hides)
+    // Update on resize (when browser chrome shows/hides or window size changes)
     window.addEventListener('resize', updateViewportHeight)
     window.addEventListener('orientationchange', updateViewportHeight)
     
@@ -324,13 +326,45 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
   // Use dynamic height or fallback to 100vh
   const modalHeight = viewportHeight > 0 ? `${viewportHeight}px` : '100vh'
   
+  // Calculate image section height based on viewport and screen size
+  const getImageSectionHeight = () => {
+    if (viewportHeight === 0) return '40vh'
+    // On mobile: 40% of viewport, on sm and up: 50%, on lg: full height
+    if (windowWidth >= 1024 || (typeof window !== 'undefined' && window.innerWidth >= 1024)) {
+      return '100%' // Desktop: full height
+    } else if (windowWidth >= 640 || (typeof window !== 'undefined' && window.innerWidth >= 640)) {
+      return `${Math.floor(viewportHeight * 0.5)}px` // Tablet: 50%
+    } else {
+      return `${Math.floor(viewportHeight * 0.4)}px` // Mobile: 40%
+    }
+  }
+  
+  const imageSectionHeight = getImageSectionHeight()
+  
+  // Calculate right panel height
+  const getRightPanelHeight = () => {
+    if (viewportHeight === 0) return '60vh'
+    if (windowWidth >= 1024 || (typeof window !== 'undefined' && window.innerWidth >= 1024)) {
+      return '100%' // Desktop: full height
+    } else if (windowWidth >= 640 || (typeof window !== 'undefined' && window.innerWidth >= 640)) {
+      return `${Math.floor(viewportHeight * 0.5)}px` // Tablet: 50%
+    } else {
+      return `${Math.floor(viewportHeight * 0.6)}px` // Mobile: 60%
+    }
+  }
+  
+  const rightPanelHeight = getRightPanelHeight()
+  
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm overflow-hidden touch-none" style={{ height: modalHeight, maxHeight: modalHeight, margin: 0, padding: 0, WebkitOverflowScrolling: 'touch' }}>
       <div className="flex flex-col lg:flex-row h-full overflow-hidden" style={{ height: modalHeight, maxHeight: modalHeight, margin: 0, padding: 0, overflow: 'hidden', touchAction: 'none', WebkitOverflowScrolling: 'touch' }}>
         {/* Left Section - Image Gallery */}
         <div
-          className="flex-1 relative bg-gray-100 lg:flex-1 h-[40vh] sm:h-[50vh] lg:h-full overflow-hidden"
+          className="relative bg-gray-100 flex-shrink-0 lg:flex-1 lg:h-full overflow-hidden"
           style={{
+            height: imageSectionHeight,
+            minHeight: imageSectionHeight,
+            maxHeight: imageSectionHeight,
             margin: 0,
             padding: 0,
             overflow: 'hidden',
@@ -347,9 +381,10 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
 
           {/* Main Image */}
           <div 
-            className="absolute inset-0 bg-gray-200 z-10 h-[40vh] sm:h-[50vh] lg:h-full" 
+            className="absolute inset-0 bg-gray-200 z-10 lg:h-full" 
             style={{ 
               width: '100%',
+              height: '100%',
               margin: 0,
               padding: 0,
               lineHeight: 0
@@ -422,7 +457,15 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
         </div>
 
         {/* Right Section - Purchase Panel */}
-        <div className="w-full lg:w-96 bg-white flex flex-col h-full min-h-0 max-h-screen lg:max-h-full overflow-hidden" style={{ touchAction: 'none' }}>
+        <div 
+          className="w-full lg:w-96 bg-white flex flex-col flex-1 min-h-0 overflow-hidden lg:h-full" 
+          style={{ 
+            touchAction: 'none',
+            height: rightPanelHeight,
+            minHeight: rightPanelHeight,
+            maxHeight: rightPanelHeight
+          }}
+        >
           {/* Header */}
           <div className="flex-shrink-0 bg-white border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2 z-10">
             <button type="button" onClick={onClose} className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full flex-shrink-0">
