@@ -372,9 +372,9 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
         </div>
 
         {/* Right Section - Purchase Panel */}
-        <div className="w-full lg:w-96 bg-white flex flex-col h-[60vh] sm:h-[50vh] lg:h-full">
+        <div className="w-full lg:w-96 bg-white flex flex-col h-[60vh] sm:h-[50vh] lg:h-full min-h-0">
           {/* Header */}
-          <div className="flex-shrink-0 bg-white border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
+          <div className="flex-shrink-0 bg-white border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2 z-10">
             <button type="button" onClick={onClose} className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full flex-shrink-0">
               <img 
                 src="https://assets.olaelectric.com/olaelectric-videos/configs-static/overlay-config-json/olaTechPack/backButton.svg"
@@ -393,7 +393,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
           </div>
 
           {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar pb-20 sm:pb-4">
+          <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 pb-24 sm:pb-4">
             {/* Color Selection */}
              <div className="px-3 sm:px-4 py-3 sm:py-4 border-b border-gray-100">
                <div className="text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">COLOR •</div>
@@ -730,7 +730,7 @@ const BuyNowModal = ({ isOpen, onClose, product }: BuyNowModalProps) => {
           </div>
 
           {/* Fixed Bottom Section - ROI + Pricing */}
-          <div className="flex-shrink-0 bg-white border-t border-gray-200 safe-area-bottom">
+          <div className="flex-shrink-0 bg-white border-t border-gray-200 safe-area-bottom sticky bottom-0 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
             {/* ROI Banner */}
             {/* <div className="px-4 py-3 bg-green-500 text-white flex items-center justify-between cursor-pointer hover:bg-green-600 transition-colors">
               <div className="flex items-center gap-2">

@@ -240,7 +240,7 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
             </div>
 
             {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 pb-20 sm:pb-6">
+            <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 min-h-0 pb-24 sm:pb-6">
               {/* Add-Ons Grid */}
               <div className="grid grid-cols-1 gap-3 sm:gap-4">
                 {addOnsData.map((addon) => (
@@ -323,7 +323,7 @@ const AddOnsModal = ({ isOpen, onClose, onContinue, moveOSAdded, setMoveOSAdded,
             </div>
 
             {/* Fixed Bottom Section */}
-            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 sm:p-4 safe-area-bottom">
+            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 sm:p-4 safe-area-bottom sticky bottom-0 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
               <button
                 type="button"
                 onClick={handleAddOnsToCart}

@@ -421,7 +421,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
           </div>
 
           {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 py-3 sm:py-4 mt-14 sm:mt-16 pb-20 sm:pb-6">
+          <div className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-4 py-3 sm:py-4 mt-14 sm:mt-16 min-h-0 pb-24 sm:pb-6">
             {/* Header */}
             <div className="mb-4 sm:mb-6">
               {/* Title and Price in same line */}
@@ -707,7 +707,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
           </div>
 
           {/* Fixed Bottom Section */}
-          <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-3 sm:p-4 space-y-2 sm:space-y-3 safe-area-bottom">
+          <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-3 sm:p-4 space-y-2 sm:space-y-3 safe-area-bottom sticky bottom-0 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
             {/* Add to Cart Button */}
             <button
               onClick={handleAddToCart}
@@ -846,7 +846,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 mt-16 pb-6">
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 mt-16 min-h-0 pb-6">
           {/* Header */}
           <div className="mb-6">
             {/* Title and Price in same line */}
@@ -1129,7 +1129,7 @@ const InsuranceModal = ({ isOpen, onClose, onContinue, selectedVariant, selected
         </div>
 
         {/* Fixed Bottom Section */}
-        <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-4 space-y-3">
+        <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-4 space-y-3 sticky bottom-0 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
           {/* Add to Cart Button */}
           <button
             onClick={handleAddToCart}
